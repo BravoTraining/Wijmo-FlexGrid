@@ -1,0 +1,24 @@
+{
+    "users":[
+        {
+            "id": 1,
+            "username": "bravohn",
+            "password": "1",
+            "role": "full"
+        },
+        {
+            "id": 2,
+            "username": "bravohcm",
+            "password": "1"
+        },
+        {
+            "id": 3,
+            "username": "bravodn",
+            "password": "1"
+        }
+    ],
+
+    "roles":[
+        "full", "Only create", "Only view", "Only select", "Only read"
+    ]
+}

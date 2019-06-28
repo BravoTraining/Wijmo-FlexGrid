@@ -1,1 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
+
+@import "wijmo/styles/wijmo.css";
+@import "./app/child-items-grid/child-items-grid.component.css";
+* {
+    font-family: 'Times New Roman', Times, serif;
+    font-weight: 16px;
+}

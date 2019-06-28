@@ -1,0 +1,28 @@
+.user-detail {
+    background-color: #f7f7f7;
+    border-radius: 5px;
+    padding: 30px;
+    margin-top: 20px;
+    height: auto;
+}
+
+.form-header {
+    padding: 0 15px;
+    align-items: center;
+    justify-content: center;
+}
+
+.form-header h3 {
+    color: #00A88E;
+    display: block;
+    text-align: center;
+}
+
+.form-header h6 {
+    color: rgb(43, 69, 184);
+    display: block;
+    text-align: center;
+    text-decoration-line: underline;
+    text-decoration-color: rgb(43, 69, 184);
+    cursor: pointer;
+}

@@ -1,0 +1,35 @@
+table {
+    border: 2px;
+}
+
+th {
+    padding: 10px;
+}
+
+thead {
+    text-align: center;
+    padding: 10px;
+    color: #00A88E;
+}
+
+td {
+    padding: 10px;
+    text-align: center;
+    /* width: auto; */
+    width: 1px;
+    white-space: nowrap;
+}
+
+.table-content {
+    background-color: #F7F7F7;
+    border-radius: 4px;
+}
+
+.table-row {
+    cursor: pointer;
+}
+
+.paging {
+    display: flex;
+    justify-content: center;
+}

@@ -1,0 +1,72 @@
+.tree-grid {
+    width: 100%;
+    max-height: 300px;
+    background-color: #fff;
+}
+
+.reporter-header {
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 10px 10px;
+}
+
+.reporter-content {
+    width: 100%;
+    max-height: 500px;
+}
+
+.reporter-footer {
+    width: 100%;
+    height: 200px;
+    background-color: aquamarine
+}
+
+.wj-cell .v-center {
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+    white-space: pre-wrap;
+}
+
+.wj-cell.wj-group.boldRow {
+    background-color: rgb(176, 204, 240);
+    color: black;
+    font-weight: bold;
+}
+
+.wj-cells .wj-cell.wj-state-multi-selected {
+    background-color: #f4fc81;
+    color: black;
+}
+
+.wj-cells .wj-cell.wj-state-selected {
+    background-color: #e5e75a;
+    color: black;
+}
+
+.wj-cell.wj-group {
+    background-color: #fff;
+    color: black;
+    font-weight: 400;
+}
+
+.wj-cell.wj-header {
+    background-color: #eee;
+    color: black;
+    font-weight: 700;
+}
+
+.itemsAdded {
+    margin-top: 10px;
+    max-height: 100px;
+}
+
+.itemsEdited {
+    margin-top: 10px;
+    max-height: 100px;
+}
+
+.itemsRemove {
+    margin-top: 10px;
+    max-height: 100px;
+}

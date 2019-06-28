@@ -1,0 +1,73 @@
+[
+    {
+        "id": 1,
+        "role": "Guest",
+        "permission": "Read"
+    },
+    {
+        "id": 1,
+        "role": "Guest",
+        "permission": "Sign Up"
+    },
+    {
+        "id": 1,
+        "role": "Guest",
+        "permission": "Sign In"
+    },
+    {
+        "id": 2,
+        "role": "Member",
+        "permission": "Read"
+    },
+    {
+        "id": 2,
+        "role": "Member",
+        "permission": "Write"
+    },
+    {
+        "id": 2,
+        "role": "Member",
+        "permission": "Sign In"
+    },
+    {
+        "id": 2,
+        "role": "Member",
+        "permission": "Send Report"
+    },
+    {
+        "id": 2,
+        "role": "Member",
+        "permission": "Delete Blog"
+    },
+    {
+        "id": 2,
+        "role": "Member",
+        "permission": "Change Password"
+    },
+    {
+        "id": 3,
+        "role": "Admin",
+        "permission": "Delete Account"
+    },
+    {
+        "id": 3,
+        "role": "Admin",
+        "permission": "Block Account"
+    },
+    {
+        "id": 3,
+        "role": "Admin",
+        "permission": "View Account"
+    },
+    {
+        "id": 3,
+        "role": "Admin",
+        "permission": "Delete Blog"
+    },
+    {
+        "id": 3,
+        "role": "Admin",
+        "permission": "create Account"
+    }
+   
+]

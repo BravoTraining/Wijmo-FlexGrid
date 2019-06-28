@@ -1,0 +1,111 @@
+<div class="container">
+    <!-- <div class="row-fluid well btn-group" style="margin-bottom: 20px">
+        <button class="btn btn-primary" (click)="view.moveCurrentToNext()">Next</button>
+        <button class="btn btn-primary" (click)="view.moveCurrentToPrevious()">Previous</button>
+    </div> -->
+
+    <div class="row-fluid well" style="margin-bottom: 20px">
+        <input type="text" class="form-control app-pad" placeholder="Please enter characters for the itemname by which to filter" [(ngModel)]='filter' />
+    </div>
+
+    <div>
+        <button class="btn btn-primary" (click)="treeView()" *ngIf="!isHidden">Tree View</button>
+        <button class="btn btn-primary" (click)="gridView()" *ngIf="isHidden">Grid View</button>
+    </div>
+
+    <div class="tree-grid">
+        <wj-flex-grid #childItem class="tree-grid" [(itemsSource)]="collectionView" [selectionMode]="'RowRange'" [headersVisibility]="'Column'" (initialized)="flexInitialized(flex)" [autoGenerateColumns]=false [allowAddNew]="true" [allowDelete]="true">
+            <!-- <wj-flex-grid-column [header]="'ID'" [binding]="'Id'"></wj-flex-grid-column> -->
+            <!-- <wj-flex-grid-column [header]="'Parent_ID'" [binding]="'ParentId'"></wj-flex-grid-column> -->
+            <wj-flex-grid-column [header]="'Mã số'" [binding]="'ItemCode'"></wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Mặt hàng'" [binding]="'ItemName'" [width]=200></wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Nhóm'" [binding]="'_GroupOrder'" [width]=200></wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Đvt'" [binding]="'Unit'" [width]=60 [allowMerging]=true></wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Số lượng'" [binding]="'OpenInventory'" [width]=100 [allowMerging]=true>
+            </wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Giá trị'" [binding]="'OpenAmount'" [width]=100 [allowMerging]=true>
+            </wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Số lượng'" [binding]="'ReceiptQuantity'" [width]=100 [allowMerging]=true>
+            </wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Giá trị'" [binding]="'ReceiptAmount'" [width]=100 [allowMerging]=true>
+            </wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Số lượng'" [binding]="'DeliveryQuantity'" [width]=100 [allowMerging]=true>
+            </wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Giá trị'" [binding]="'DeliveryAmount'"></wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Số lượng'" [binding]="'CloseInventory'" [width]=100 [allowMerging]=true>
+            </wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Giá trị'" [binding]="'CloseAmount'"></wj-flex-grid-column>
+            <!-- <wj-flex-grid-column [header]="'Công nợ'" [binding]="'OriginalReceiptAmount'" [width]=200></wj-flex-grid-column>
+        <!-- <wj-flex-grid-column [header]="'Chiết khấu'" [binding]="'OriginalDeliveryAmount'" [width]=160></wj-flex-grid-column> -->
+        </wj-flex-grid>
+    </div>
+
+    <!-- <div class="itemsAdded">
+        <h6 style="color: #fff; font-weight: 600">ItemsAdded:</h6>
+        <wj-flex-grid [(itemsSource)]="collectionView.itemsAdded">
+            <wj-flex-grid-column [header]="'Mã số'" [binding]="'ItemCode'"></wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Mặt hàng'" [binding]="'ItemName'" [width]=200></wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Đvt'" [binding]="'Unit'" [width]=60 [allowMerging]=true></wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Số lượng'" [binding]="'OpenInventory'" [width]=100 [allowMerging]=true>
+            </wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Giá trị'" [binding]="'OpenAmount'" [width]=100 [allowMerging]=true>
+            </wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Số lượng'" [binding]="'ReceiptQuantity'" [width]=100 [allowMerging]=true>
+            </wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Giá trị'" [binding]="'ReceiptAmount'" [width]=100 [allowMerging]=true>
+            </wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Số lượng'" [binding]="'DeliveryQuantity'" [width]=100 [allowMerging]=true>
+            </wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Giá trị'" [binding]="'DeliveryAmount'"></wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Số lượng'" [binding]="'CloseInventory'" [width]=100 [allowMerging]=true>
+            </wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Giá trị'" [binding]="'CloseAmount'"></wj-flex-grid-column>
+        </wj-flex-grid>
+    </div> -->
+
+    <!-- <div class="itemsEdited">
+        <h6 style="color: blue; font-weight: 600">ItemsEdited</h6>
+        <wj-flex-grid [(itemsSource)]="collectionView.itemsEdited">
+            <wj-flex-grid-column [header]="'Mã số'" [binding]="'ItemCode'"></wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Mặt hàng'" [binding]="'ItemName'" [width]=200></wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Đvt'" [binding]="'Unit'" [width]=60 [allowMerging]=true></wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Số lượng'" [binding]="'OpenInventory'" [width]=100 [allowMerging]=true>
+            </wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Giá trị'" [binding]="'OpenAmount'" [width]=100 [allowMerging]=true>
+            </wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Số lượng'" [binding]="'ReceiptQuantity'" [width]=100 [allowMerging]=true>
+            </wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Giá trị'" [binding]="'ReceiptAmount'" [width]=100 [allowMerging]=true>
+            </wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Số lượng'" [binding]="'DeliveryQuantity'" [width]=100 [allowMerging]=true>
+            </wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Giá trị'" [binding]="'DeliveryAmount'"></wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Số lượng'" [binding]="'CloseInventory'" [width]=100 [allowMerging]=true>
+            </wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Giá trị'" [binding]="'CloseAmount'"></wj-flex-grid-column>
+        </wj-flex-grid>
+    </div>
+
+    <div class="itemsRemove">
+        <h6 style="color: #000; font-weight: 600">ItemsRemove</h6>
+        <wj-flex-grid [(itemsSource)]="collectionView.itemsRemoved">
+            <wj-flex-grid-column [header]="'Mã số'" [binding]="'ItemCode'"></wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Mặt hàng'" [binding]="'ItemName'" [width]=200></wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Đvt'" [binding]="'Unit'" [width]=60 [allowMerging]=true></wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Số lượng'" [binding]="'OpenInventory'" [width]=100 [allowMerging]=true>
+            </wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Giá trị'" [binding]="'OpenAmount'" [width]=100 [allowMerging]=true>
+            </wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Số lượng'" [binding]="'ReceiptQuantity'" [width]=100 [allowMerging]=true>
+            </wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Giá trị'" [binding]="'ReceiptAmount'" [width]=100 [allowMerging]=true>
+            </wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Số lượng'" [binding]="'DeliveryQuantity'" [width]=100 [allowMerging]=true>
+            </wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Giá trị'" [binding]="'DeliveryAmount'"></wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Số lượng'" [binding]="'CloseInventory'" [width]=100 [allowMerging]=true>
+            </wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Giá trị'" [binding]="'CloseAmount'"></wj-flex-grid-column>
+        </wj-flex-grid>
+    </div> -->
+</div>

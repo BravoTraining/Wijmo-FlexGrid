@@ -1,0 +1,29 @@
+.login-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
+    background-color: #F7F7F7;
+    padding: 80px 50px;
+    border-radius: 4px;
+}
+
+label {
+    color: #00A88E;
+    /* font-weight: bold; */
+    font-size: 20px;
+}
+
+h3 {
+    color: #00A88E;
+}
+
+.btn.btn-info.btn-block {
+    font-size: 20px;
+    font-weight: 400;
+}
+
+.login-error {
+    margin-bottom: 30px;
+}

@@ -1,0 +1,26 @@
+<div class="container">
+
+    <div class="grid-data">
+        <wj-flex-grid [(itemsSource)]="data" #mainData [allowAddNew]="true" [allowDelete]="true" [isReadOnly]="true" [selectionMode]="'Row'" (initialized)="flexInitialized(flex)">
+            <wj-flex-grid-column [header]="'ID'" [binding]="'id'"></wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'NAME'" [binding]="'name'"></wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'PHONE'" [binding]="'phoneNumber'"></wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'EMAIL'" [binding]="'email'"></wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'ADDRESS'" [binding]="'address'"></wj-flex-grid-column>
+        </wj-flex-grid>
+    </div>
+
+    <div class="role-detail">
+        <wj-flex-grid [(itemsSource)]="dataRoles">
+            <wj-flex-grid-column [header]="'Role'" [binding]="'role'"></wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Permission'" [binding]="'permission'"></wj-flex-grid-column>
+        </wj-flex-grid>
+    </div>
+
+    <div class="role-list">
+        <div id="roleList" class="role-list">
+
+        </div>
+    </div>
+
+</div>
