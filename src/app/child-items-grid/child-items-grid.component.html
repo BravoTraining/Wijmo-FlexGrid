@@ -4,9 +4,9 @@
         <button class="btn btn-primary" (click)="view.moveCurrentToPrevious()">Previous</button>
     </div> -->
 
-    <div class="row-fluid well" style="margin-bottom: 20px">
+    <!-- <div class="row-fluid well" style="margin-bottom: 20px">
         <input type="text" class="form-control app-pad" placeholder="Please enter characters for the itemname by which to filter" [(ngModel)]='filter' />
-    </div>
+    </div> -->
 
     <div>
         <button class="btn btn-primary" (click)="treeView()" *ngIf="!isHidden">Tree View</button>
@@ -15,11 +15,8 @@
 
     <div class="tree-grid">
         <wj-flex-grid #childItem class="tree-grid" [(itemsSource)]="collectionView" [selectionMode]="'RowRange'" [headersVisibility]="'Column'" (initialized)="flexInitialized(flex)" [autoGenerateColumns]=false [allowAddNew]="true" [allowDelete]="true">
-            <!-- <wj-flex-grid-column [header]="'ID'" [binding]="'Id'"></wj-flex-grid-column> -->
-            <!-- <wj-flex-grid-column [header]="'Parent_ID'" [binding]="'ParentId'"></wj-flex-grid-column> -->
             <wj-flex-grid-column [header]="'Mã số'" [binding]="'ItemCode'"></wj-flex-grid-column>
             <wj-flex-grid-column [header]="'Mặt hàng'" [binding]="'ItemName'" [width]=200></wj-flex-grid-column>
-            <wj-flex-grid-column [header]="'Nhóm'" [binding]="'_GroupOrder'" [width]=200></wj-flex-grid-column>
             <wj-flex-grid-column [header]="'Đvt'" [binding]="'Unit'" [width]=60 [allowMerging]=true></wj-flex-grid-column>
             <wj-flex-grid-column [header]="'Số lượng'" [binding]="'OpenInventory'" [width]=100 [allowMerging]=true>
             </wj-flex-grid-column>
@@ -31,14 +28,20 @@
             </wj-flex-grid-column>
             <wj-flex-grid-column [header]="'Số lượng'" [binding]="'DeliveryQuantity'" [width]=100 [allowMerging]=true>
             </wj-flex-grid-column>
-            <wj-flex-grid-column [header]="'Giá trị'" [binding]="'DeliveryAmount'"></wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Giá trị'" [binding]="'DeliveryAmount'" [width]=100 [allowMerging]=true></wj-flex-grid-column>
             <wj-flex-grid-column [header]="'Số lượng'" [binding]="'CloseInventory'" [width]=100 [allowMerging]=true>
             </wj-flex-grid-column>
             <wj-flex-grid-column [header]="'Giá trị'" [binding]="'CloseAmount'"></wj-flex-grid-column>
-            <!-- <wj-flex-grid-column [header]="'Công nợ'" [binding]="'OriginalReceiptAmount'" [width]=200></wj-flex-grid-column>
-        <!-- <wj-flex-grid-column [header]="'Chiết khấu'" [binding]="'OriginalDeliveryAmount'" [width]=160></wj-flex-grid-column> -->
+
         </wj-flex-grid>
     </div>
+
+    <!-- <div style="margin-top: 30px">
+        <img src='data:image/png;base64,{{zImgBase64}}' />
+    </div> -->
+
+    <!-- <div [innerHTML]="zHtmlContent | safeHtml"></div> -->
+
 
     <!-- <div class="itemsAdded">
         <h6 style="color: #fff; font-weight: 600">ItemsAdded:</h6>

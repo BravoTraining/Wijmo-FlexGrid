@@ -1,11 +1,10 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { UserService } from '../user.service';
 
 import * as wjcGrid from 'wijmo/wijmo.grid';
 import * as wjcInput from 'wijmo/wijmo.input';
 import * as wjcCore from 'wijmo/wijmo';
-
-
+import { isNullOrUndefined } from 'util';
 
 class CustomMergeManager extends wjcGrid.MergeManager {
   constructor(flexGrid: wjcGrid.FlexGrid) {
@@ -77,30 +76,6 @@ class CustomMergeManager extends wjcGrid.MergeManager {
 }
 
 const columnPos = 1;
-const _layout = [
-  { header: 'Mã số', binding: 'ItemCode', width: 100 },
-  { header: 'Mặt hàng', binding: 'ItemName', width: 100 },
-  { header: 'Đvt', binding: 'Unit', width: 100 },
-  { header: 'Số lượng', binding: 'OpenInventory', width: 100 },
-  { header: 'Giá trị', binding: 'OpenAmount', width: 100 },
-  { header: 'Số lượng', binding: 'ReceiptQuantity', width: 100 },
-  { header: 'Giá trị', binding: 'ReceiptAmount', width: 100 },
-  { header: 'Số lượng', binding: 'DeliveryQuantity', width: 100 },
-  { header: 'Giá trị', binding: 'DeliveryAmount', width: 100 },
-  { header: 'Số lượng', binding: 'OriginalReceiptAmount', width: 100 },
-  { header: 'Giá trị', binding: 'OriginalDeliveryAmount', width: 100 }
-]
-
-class dataComponent {
-  data: any[];
-  treeData = [];
-  child: any[];
-  addRow: true;
-  flag = 0;
-
-  constructor() {
-  }
-}
 
 
 @Component({
@@ -108,8 +83,9 @@ class dataComponent {
   templateUrl: './child-items-grid.component.html',
   styleUrls: ['./child-items-grid.component.css'],
 })
-export class ChildItemsGridComponent implements OnInit {
+export class ChildItemsGridComponent implements OnInit, AfterViewInit {
   data: any[];
+  parentItems: any[];
   treeData = [];
   child: any[];
   addRow: true;
@@ -117,21 +93,14 @@ export class ChildItemsGridComponent implements OnInit {
   flag = 0;
   isHidden = false;
 
-
-
   collectionView: wjcCore.CollectionView;
-  private _toFilter: any;
-  private _thisFilterFunction: wjcCore.IPredicate;
-  private _filter: string;
 
   constructor(private userService: UserService) {
-    this._thisFilterFunction = this._filterFunction.bind(this);
-
-
   }
 
   ngOnInit() {
     this.getInitData();
+    
   }
 
   // @ViewChild('childItem') flex: wjcGrid.FlexGrid;
@@ -141,7 +110,7 @@ export class ChildItemsGridComponent implements OnInit {
   flexInitialized(flexgrid: wjcGrid.FlexGrid) {
     flexgrid.mergeManager = new CustomMergeManager(flexgrid);
     flexgrid.childItemsPath = "children";
-    flexgrid.isReadOnly = false;
+    // flexgrid.isReadOnly = false;
     this.loadedRows();
     this.mergeHeader(flexgrid);
     this.formatItem();
@@ -167,7 +136,7 @@ export class ChildItemsGridComponent implements OnInit {
       panel.setCellData(0, idxCol, "Cuối kỳ");
     }
 
-    let binding = ['ItemCode', 'ItemName', 'Unit', '_GroupOrder'];
+    let binding = ['ItemCode', 'ItemName', 'Unit'];
 
     binding.forEach(function (binding) {
       let col = flexGrid.getColumn(binding);
@@ -209,6 +178,9 @@ export class ChildItemsGridComponent implements OnInit {
     }
 
     if (s.cells == e.panel) {
+      
+      
+
       if (e.panel.rows[e.row].hasChildren) {
         e.panel.rows[e.row].cssClass = 'boldRow';
         e.panel.rows[e.row].isReadOnly = true;
@@ -254,49 +226,11 @@ export class ChildItemsGridComponent implements OnInit {
     this.isHidden = !this.isHidden;
   }
 
-  get filter(): string {
-    return this._filter;
-  }
-  set filter(value: string) {
-    if (this._filter != value) {
-      this._filter = value;
-      this._applyFilter();
-    }
-  }
-
-  private _applyFilter() {
-    if (this._toFilter) {
-      clearTimeout(this._toFilter);
-    }
-
-    this._toFilter = setTimeout(() => {
-      this._toFilter = null;
-      if (this.collectionView) {
-        let cv = this.collectionView;
-        if (cv) {
-          if (cv.filter != this._thisFilterFunction) {
-            cv.filter = this._thisFilterFunction;
-          } else {
-            cv.refresh();
-          }
-        }
-      }
-    }, 500);
-  }
-
-  private _filterFunction(item: any): boolean {
-    var filter = this.filter.toLowerCase();
-    if (!filter) {
-      return true;
-    }
-    return item['ItemName'].toLowerCase().indexOf(filter) > -1;
-  }
-
-
   getInitData() {
     this.userService.getData().subscribe(data => {
       this.data = data;
-      this.collectionView = new wjcCore.CollectionView(this.data)
+      this.collectionView = new wjcCore.CollectionView(this.data);
+      
     })
   }
 
@@ -401,4 +335,10 @@ export class ChildItemsGridComponent implements OnInit {
     }
   }
 
+
+  @ViewChild('dropdown', {static:false}) menu: wjcInput.Menu;
+
+  public ngAfterViewInit() {
+    // this.menu.itemsSource = ['New', 'Open', 'Save', 'Exit'];
+  }
 }

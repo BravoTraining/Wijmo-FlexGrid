@@ -23,6 +23,8 @@ export class WijmoExampleComponent implements OnInit {
   rowIndex = -1;
   id: any;
 
+  
+
   private subscription: Subscription;
   private myService = new Subject();
 
@@ -41,7 +43,6 @@ export class WijmoExampleComponent implements OnInit {
       })
   }
 
-  // @ViewChild('mainData') flex: wjcGrid.FlexGrid;
   @ViewChild('mainData', {static: true}) flex: wjcGrid.FlexGrid;
 
   initData() {
@@ -95,17 +96,5 @@ export class WijmoExampleComponent implements OnInit {
     this.id = this.selectedItem.role_id;
     this.myService.next();
   }
-
-  // { header: 'Id', binding: 'Id', width: 100},
-//       { header: 'ParentId', binding: 'ParentId', width: 100},
-//       { header: 'ItemCode', binding: 'ItemCode', width: 100},
-//       { header: 'CustomerCode', binding: 'CustomerCode', width: 100},
-//       { header: 'ItemName', binding: 'ItemName', width: 100},
-//       { header: 'Amount', binding: 'Amount', width: 100},
-//       { header: 'Amount2', binding: 'Amount2', width: 100},
-//       { header: 'Amount131', binding: 'Amount131', width: 100},
-//       { header: 'TotalAmount', binding: 'TotalAmount', width: 100},
-//       { header: 'Profit', binding: 'Profit', width: 100}
-
 
 }

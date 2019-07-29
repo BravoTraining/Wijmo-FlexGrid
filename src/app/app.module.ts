@@ -4,6 +4,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 import { WjGridModule } from 'wijmo/wijmo.angular2.grid';
 import { WjChartModule } from 'wijmo/wijmo.angular2.chart';
+import { WjInputModule } from 'wijmo/wijmo.angular2.input';
 
 import { AppComponent } from './app.component';
 import { UsersComponent } from './users/users.component';
@@ -22,6 +23,8 @@ import { ObservableRxjsComponent } from './observable-rxjs/observable-rxjs.compo
 import { CombinationComponent } from './combination/combination.component';
 import { WijmoExampleComponent } from './wijmo-example/wijmo-example.component';
 import { ChildItemsGridComponent } from './child-items-grid/child-items-grid.component';
+import { SafehtmlPipe } from './PipeCustomer/safehtml.pipe';
+import { WijmoGroupingComponent } from './wijmo-grouping/wijmo-grouping.component';
 
 
 @NgModule({
@@ -34,7 +37,9 @@ import { ChildItemsGridComponent } from './child-items-grid/child-items-grid.com
     ObservableRxjsComponent,
     CombinationComponent,
     WijmoExampleComponent,
-    ChildItemsGridComponent
+    ChildItemsGridComponent,
+    SafehtmlPipe,
+    WijmoGroupingComponent
   ],
   imports: [
     BrowserModule,
@@ -44,9 +49,10 @@ import { ChildItemsGridComponent } from './child-items-grid/child-items-grid.com
     HttpClientModule,
     WjChartModule,
     WjGridModule,
+    WjInputModule,
     // WjInputModule,
     BsDatepickerModule.forRoot(),
-    PaginationModule.forRoot()
+    PaginationModule.forRoot(),
   ],
   providers: [UserService],
   bootstrap: [AppComponent]
