@@ -38,13 +38,17 @@
 
 <wj-menu
   #groupMenu
-  [displayMemberPath]="'name'" [selectedValuePath]="'name'"
-  [header]="groupMenu.selectedItem ? groupMenu.selectedItem.name  : groupMenu.name"
+  [displayMemberPath]="'name'" [selectedValuePath]="'name'" (initialized)="initializeMenu(groupMenu)"
+  [header]="groupMenu.selectedItem ? groupMenu.selectedItem.name : groupMenu.name"
   (itemClicked)="onClickItem(groupMenu, flexGroup)"
  
 > </wj-menu>
 
-<wj-flex-grid style="max-height: 500px" #flexGroup [(itemsSource)]="groupData" [selectionMode]="'Row'" (initialized)="flexInitialized(flexGroup, groupMenu)">
+<div id="menuControl">
+
+</div>
+
+<wj-flex-grid style="max-height: 500px" #flexGroup [selectionMode]="'Row'" (initialized)="flexInitialized(flexGroup, groupMenu)">
   <wj-flex-grid-column
     *ngFor="let col of _columnAvailable"
     [binding]="col"
