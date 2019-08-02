@@ -4,13 +4,14 @@ import * as wjInput from 'wijmo/wijmo.input';
 import * as wjCore from 'wijmo/wijmo';
 import * as wjGrid from 'wijmo/wijmo.grid';
 
-import { DropDown } from '../controller/dropdown';
+
 
 import { UserService } from '../user.service';
-import { WjComponentResolvedMetadata } from 'wijmo/wijmo.angular2.directiveBase';
-import { getDate } from 'ngx-bootstrap/chronos/utils/date-getters';
-import { createVerify } from 'crypto';
-import { isNull } from 'util';
+import { isNull, isNullOrUndefined } from 'util';
+import { MenuStrip } from '../controller/menustrip';
+import { DropDown } from '../controller/dropdown';
+import { ToolStrip } from '../lib/ui/toolstrip/toolstrip';
+import { BravoWebButton } from '../lib/ui/toolstrip/bravo.web.button';
 
 @Component({
   selector: 'app-wijmo-grouping',
@@ -29,39 +30,27 @@ export class WijmoGroupingComponent implements OnInit {
   _columnAvailable = ['ItemCode', 'ItemName', 'Unit', 'OpenInventory', 'OpenAmount'];
   _groupDescription = ['ItemName'];
   cv = new wjCore.CollectionView;
-  gd = new wjCore.PropertyGroupDescription('ItemName')
+  gd = new wjCore.PropertyGroupDescription('OpenInventory')
   hostElem: HTMLElement;
-
+  _menuStrip: any;
+  _dropDownList = [];
+  _parentNodeList = [];
 
 
   constructor(private userService: UserService,
     private elRef: ElementRef) {
-
   }
 
   ngOnInit() {
     this.getInitData();
     this.hostElem = document.getElementById('menuControl');
-    let drop = new DropDown(this.hostElem, this._groupMenuItems);
-    console.log(this.hostElem);
-    console.log(drop)
-
   }
 
   getInitData() {
-    // this._groupDescription.forEach((item) => {
-    //   this.cv.groupDescriptions.push(new wjCore.PropertyGroupDescription(item));
-    // })
     this.cv.groupDescriptions.push(this.gd);
     this.userService.getData().subscribe(data => {
       this._dataSources = data.splice(0, 1000);
       this.cv.sourceCollection = this._dataSources;
-
-      this.cv.groups.forEach((item) => {
-        this._groupMenuItems.push(item);
-      })
-
-      this.groupMenu.itemsSource = this._groupMenuItems;
 
       let _item = data[0];
       for (const key in _item) {
@@ -72,15 +61,7 @@ export class WijmoGroupingComponent implements OnInit {
     })
   }
 
-
-  initializeMenu(menu: wjInput.Menu) {
-    this.groupMenu.maxDropDownHeight = 250;
-  }
-
-  @ViewChild('groupItems', { static: false }) groupItem: wjGrid.FlexGrid;
-  @ViewChild('groupMenu', { static: false }) groupMenu: wjInput.Menu;
-
-  columnAvailableChange(event: any) {
+  columnAvailableChanged(event: any) {
     if (event.target.checked) {
       this._columnAvailable.push(event.target.value);
       return;
@@ -103,6 +84,7 @@ export class WijmoGroupingComponent implements OnInit {
     this.cv.groupDescriptions.forEach((item, idx) => {
       if (item.propertyName === event.target.value) {
         this.cv.groupDescriptions.splice(idx, 1);
+        this.removeDropDown(this._dropDownList, idx, this.hostElem);
       }
     })
   }
@@ -116,55 +98,81 @@ export class WijmoGroupingComponent implements OnInit {
     return false;
   }
 
-  onClickItem(menu: wjInput.Menu, grid: wjGrid.FlexGrid) {
-    let _menuItem = menu.selectedItem;
 
-    for (let i = menu.selectedIndex * this.cv.groupDescriptions.length; i < grid.rows.length; i++) {
-      let item = grid.rows[i];
-      if (item instanceof wjGrid.GroupRow) {
+  flexInitialized(flex: wjGrid.FlexGrid) {
+    flex.itemsSource = this.cv;
 
-        if (item.dataItem.name === _menuItem.name) {
-          grid.select(new wjGrid.CellRange(i, 0), true);
-          return;
-        }
+
+    flex.selectionChanged.addHandler((s, e: wjGrid.FormatItemEventArgs) => {
+      let _row = flex.selectedRows[0];
+      if (!isNullOrUndefined(_row) && this.cv.groupDescriptions.length > 0) {
+        this._parentNodeList = [];
+        this.getAllGroupRow(_row, this._parentNodeList);
+      }
+    })
+
+    flex.loadedRows.addHandler(() => {
+      let _row = flex.selectedRows[0];
+      this.addNewDropDown(this._dropDownList, this.cv, this.hostElem);
+    })
+  }
+
+  private addNewDropDown(pDropDownList: any, pCollectionView: wjCore.CollectionView, pHostElem: HTMLElement) {
+    if (pDropDownList.length !== 0) {
+      let _dropDown = new DropDown(document.createElement('div'));
+      _dropDown.text = pCollectionView.groupDescriptions[pCollectionView.groupDescriptions.length - 1].propertyName;
+      pHostElem.appendChild(_dropDown.hostElement);
+      pDropDownList.push(_dropDown);
+      return;
+    }
+
+    pCollectionView.groupDescriptions.forEach((groupDes) => {
+      let _dropDown = new DropDown(document.createElement('div'));
+      _dropDown.text = groupDes.propertyName;
+      _dropDown.displayMemberPath = "_name";
+      pHostElem.appendChild(_dropDown.hostElement);
+      pDropDownList.push(_dropDown);
+    })
+  }
+
+  private removeDropDown(pDropDownList: any, pnIndex: number, pHostElem: HTMLElement) {
+    pHostElem.removeChild(pHostElem.childNodes[pnIndex]);
+    pDropDownList.splice(pnIndex, 1);
+  }
+
+  private addItemsDropDown(pDropDownList: any, pNodeIsLevelList: any) {
+    let _nIndex = 0;
+    if (pDropDownList[0].itemsSource.length !== 0) {
+      _nIndex = 1;
+    }
+    for (_nIndex; _nIndex < pNodeIsLevelList.length; _nIndex++) {
+      pDropDownList[_nIndex].itemsSource.splice(0, pDropDownList[_nIndex].itemsSource.length);
+      for (let i = 0; i < pNodeIsLevelList[_nIndex].length; i++) {
+        pDropDownList[_nIndex].itemsSource.push(
+          new ToolStrip(pNodeIsLevelList[_nIndex][i].index.toString(),
+            document.createElement('div'), pNodeIsLevelList[_nIndex][i].dataItem.name.toString()));
       }
     }
   }
 
-  flexInitialized(flex: wjGrid.FlexGrid, menu: wjInput.Menu) {
-    flex.itemsSource = this.cv;
+  public getAllGroupRow(pRow, pParentNodeList: any) {
+    if (pRow instanceof (wjGrid.GroupRow)) {
+      pParentNodeList.push(pRow);
+      let parentNode = this.getParentNode(pRow);
+      this.getAllGroupRow(parentNode, pParentNodeList);
+    }
+    else {
+      if (isNull(pRow)) {
+        return;
+      }
 
-    flex.selectionChanged.addHandler((s, e: wjGrid.FormatItemEventArgs) => {
-        let row = flex.selectedRows[0];
-        let currentNode = [];
-        this.getAllParentNode(row, currentNode);
-        menu.text = currentNode[currentNode.length - 1].dataItem.name;
-    })
-
-    new DropDown(this.hostElem, this.cv.sourceCollection);
+      let parentNode = this.getParentNode(pRow);
+      this.getAllGroupRow(parentNode, pParentNodeList);
+    }
   }
 
-  public getAllParentNode(row, currentNode: any) {
-    let parentNode = this.getParentNode(row);
-    if (parentNode != null && parentNode.level > 0) {
-      currentNode.push(parentNode)
-      this.getAllParentNode(parentNode, currentNode);
-    }
-
-    if (isNull(parentNode)) {
-      currentNode.push(row)
-      return;
-    }
-
-    if (parentNode.level === 0) {
-      currentNode.push(parentNode);
-      return;
-    }
-
-  }
-
-  public getAllNodeIsLevel(row) {
-
+  public getAllNodeIsLevel(pRow, pParentNodeList: any) {
+    
   }
 
   public getParentNode(row) {

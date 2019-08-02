@@ -15,12 +15,13 @@
       (change)="columnAvailableChanged($event)"
       [checked]="checkColAvailable(col)"
     />
+    
   </div>
 </div>
 
 <label>Grouping</label>
 <div
-  style="height: 100px; border: blue thin solid; padding: 5px; margin-bottom: 10px"
+  style="height: 50px; border: blue thin solid; padding: 5px; margin-bottom: 10px"
 >
   <div
     *ngFor="let col of _columnAvailable"
@@ -36,16 +37,7 @@
   </div>
 </div>
 
-<wj-menu
-  #groupMenu
-  [displayMemberPath]="'name'" [selectedValuePath]="'name'" (initialized)="initializeMenu(groupMenu)"
-  [header]="groupMenu.selectedItem ? groupMenu.selectedItem.name : groupMenu.name"
-  (itemClicked)="onClickItem(groupMenu, flexGroup)"
- 
-> </wj-menu>
-
 <div id="menuControl">
-
 </div>
 
 <wj-flex-grid style="max-height: 500px" #flexGroup [selectionMode]="'Row'" (initialized)="flexInitialized(flexGroup, groupMenu)">
