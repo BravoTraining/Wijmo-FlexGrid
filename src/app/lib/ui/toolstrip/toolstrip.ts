@@ -1,6 +1,6 @@
 import * as wjc from 'wijmo/wijmo';
 import { IBravoToolStrip } from '../interface/IBravoToolStrip';
-import { BravoWebButton } from '../toolstrip/bravo.web.button';
+import { BravoWebButton } from '../../ui/toolstrip/bravo.web.button';
 import { PropertyChangedEventArgs } from '../eventArgs/propertyChanged.eventargs';
 import { MergeAction } from '../enums';
 

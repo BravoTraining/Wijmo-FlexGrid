@@ -386,3 +386,134 @@ export enum LookupStatusEnum {
     NoMatchedValue,
     SearchError
 }
+
+export enum GridCellTypeEnum {
+    /// <summary>
+    /// Non-determined cell
+    /// </summary>
+    None,
+
+    /// <summary>
+    /// Normal cell
+    /// </summary>
+    Normal,
+
+    /// <summary>
+    /// Check cell
+    /// </summary>
+    Check,
+
+    /// <summary>
+    /// Image cell
+    /// </summary>
+    img,
+
+    /// <summary>
+    /// HTML cell
+    /// </summary>
+    html,
+
+    /// <summary>
+    /// RTF cell
+    /// </summary>
+    rtf,
+
+    /// <summary>
+    /// Barcode cell
+    /// </summary>
+    barcode,
+
+    /// <summary>
+    /// Quick response barcode
+    /// </summary>
+    qrcode,
+
+    /// <summary>
+    /// Progress bar
+    /// </summary>
+    progress,
+
+    /// <summary>
+    /// Link
+    /// </summary>
+    link,
+}
+
+export enum RestrictedColumnEnum {
+    None = 0,
+    NoAddNew = 1,
+    NoEdit = 2,
+    NoEditDOU = 4,
+    NoOpen = 8,
+    NoOpenDOU = 16
+}
+
+export enum Border3DSide {
+    Left = 1,
+    Top = 2,
+    Right = 4,
+    Bottom = 8,
+    Middle = 2048,
+    All = 2063
+}
+
+export enum SubtotalPositionEnum {
+    AboveData = 0,
+    BelowData = 1
+}
+
+
+
+export enum GridCountGroupChildEnum {
+    /// <summary>
+    /// Not counting and displaying
+    /// </summary>
+    Hide = 0,
+
+    /// <summary>
+    /// Counting and displaying total of child groups only
+    /// </summary>
+    GroupOnly = 1,
+
+    /// <summary>
+    /// Counting and displaying total of child data only
+    /// </summary>
+    DataOnly = 2,
+
+    /// <summary>
+    /// Counting and displaying total of all childs only
+    /// </summary>
+    All = 3
+}
+
+export enum GridBuiltInContextMenuEnum {
+    /// <summary>
+    /// No built-in context menu (be negated by any other value)
+    /// </summary>
+    None = 0,
+
+    /// <summary>
+    /// Built-in context menu for row header
+    /// </summary>
+    ContextMenuForRowHeader = 1,
+
+    /// <summary>
+    /// Built-in context menu for column header
+    /// </summary>
+    ContextMenuForColHeader = 2,
+
+    /// <summary>
+    /// Built-in context menu for node
+    /// </summary>
+    ContextMenuForNode = 4,
+
+    /// <summary>
+    /// Built-in context menu for top-left fixed cells
+    /// </summary>
+    ContextMenuForGridHeader = 8,
+
+    /// <summary>
+    /// Auto detected context menu (combine all)
+    /// </summary>
+    Automatic = 15
+}

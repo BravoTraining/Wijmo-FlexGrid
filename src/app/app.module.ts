@@ -26,6 +26,9 @@ import { ChildItemsGridComponent } from './child-items-grid/child-items-grid.com
 import { SafehtmlPipe } from './PipeCustomer/safehtml.pipe';
 import { WijmoGroupingComponent } from './wijmo-grouping/wijmo-grouping.component';
 
+import { BravoGroupPathComponent } from './bravo-group-path/bravo-group-path.component'
+
+
 
 @NgModule({
   declarations: [
@@ -39,7 +42,8 @@ import { WijmoGroupingComponent } from './wijmo-grouping/wijmo-grouping.componen
     WijmoExampleComponent,
     ChildItemsGridComponent,
     SafehtmlPipe,
-    WijmoGroupingComponent
+    WijmoGroupingComponent,
+    BravoGroupPathComponent
   ],
   imports: [
     BrowserModule,

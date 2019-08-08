@@ -218,6 +218,7 @@ export class ChildItemsGridComponent implements OnInit, AfterViewInit {
 
   treeView() {
     this.buildTreeFromCollection(this.collectionView);
+    console.log(this.flex)
     this.isHidden = !this.isHidden;
   }
 
@@ -336,7 +337,7 @@ export class ChildItemsGridComponent implements OnInit, AfterViewInit {
   }
 
 
-  @ViewChild('dropdown', {static:false}) menu: wjcInput.Menu;
+  // @ViewChild('dropdown', {static:false}) menu: wjcInput.Menu;
 
   public ngAfterViewInit() {
     // this.menu.itemsSource = ['New', 'Open', 'Save', 'Exit'];
