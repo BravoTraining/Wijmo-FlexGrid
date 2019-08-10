@@ -5,6 +5,8 @@ import * as wjcGrid from 'wijmo/wijmo.grid';
 import * as wjcInput from 'wijmo/wijmo.input';
 import * as wjcCore from 'wijmo/wijmo';
 import { isNullOrUndefined } from 'util';
+import { BravoGroupPathComponent } from '../bravo-group-path/bravo-group-path.component';
+import { BravoGrouppath } from '../bravo.grouppath';
 
 class CustomMergeManager extends wjcGrid.MergeManager {
   constructor(flexGrid: wjcGrid.FlexGrid) {
@@ -92,6 +94,7 @@ export class ChildItemsGridComponent implements OnInit, AfterViewInit {
   bra = "bravo";
   flag = 0;
   isHidden = false;
+  brGroupPath: BravoGrouppath;
 
   collectionView: wjcCore.CollectionView;
 
@@ -105,15 +108,20 @@ export class ChildItemsGridComponent implements OnInit, AfterViewInit {
 
   // @ViewChild('childItem') flex: wjcGrid.FlexGrid;
   @ViewChild('childItem', {static: true}) flex: wjcGrid.FlexGrid;
-
+  @ViewChild('menuGroupPath', {static: true}) menu: BravoGroupPathComponent;
 
   flexInitialized(flexgrid: wjcGrid.FlexGrid) {
     flexgrid.mergeManager = new CustomMergeManager(flexgrid);
     flexgrid.childItemsPath = "children";
+    this.brGroupPath = new BravoGrouppath(document.createElement('div'), flexgrid);
     // flexgrid.isReadOnly = false;
     this.loadedRows();
     this.mergeHeader(flexgrid);
     this.formatItem();
+
+    flexgrid.loadedRows.addHandler(() => {
+      this.brGroupPath.createNewGroupPath(this.menu);
+    })
   }
 
   mergeHeader(flexGrid: wjcGrid.FlexGrid) {
@@ -160,6 +168,8 @@ export class ChildItemsGridComponent implements OnInit, AfterViewInit {
     sender.rows.forEach(function (row) {
       row.isReadOnly = false;
     })
+
+
   }
 
   currentChange() {
@@ -218,13 +228,20 @@ export class ChildItemsGridComponent implements OnInit, AfterViewInit {
 
   treeView() {
     this.buildTreeFromCollection(this.collectionView);
-    console.log(this.flex)
     this.isHidden = !this.isHidden;
+    this.flex.rows.forEach((row) => {
+      if (row.hasChildren) {
+        console.log(row);
+      }
+      
+      
+    })
   }
 
   gridView() {
     this.unBuildTreeFromCollection(this.collectionView);
     this.isHidden = !this.isHidden;
+
   }
 
   getInitData() {

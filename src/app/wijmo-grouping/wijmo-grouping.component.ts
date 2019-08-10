@@ -15,13 +15,13 @@ import { BravoGroupPathComponent } from '../bravo-group-path/bravo-group-path.co
 import { _DonutSegment } from 'wijmo/wijmo.chart';
 import { BravoGrouppath } from '../bravo.grouppath';
 
- 
+
 @Component({
   selector: 'app-wijmo-grouping',
   templateUrl: './wijmo-grouping.component.html',
   styleUrls: ['./wijmo-grouping.component.css']
 })
-export class WijmoGroupingComponent implements OnInit, AfterViewInit{
+export class WijmoGroupingComponent implements OnInit, AfterViewInit {
 
   groupData: wjCore.CollectionView;
   columnName: wjCore.ObservableArray;
@@ -40,12 +40,11 @@ export class WijmoGroupingComponent implements OnInit, AfterViewInit{
   _parentNodeList = [];
   brGroupPath: BravoGrouppath;
 
-
   constructor(private userService: UserService,
     private elRef: ElementRef) {
   }
 
-  @ViewChild("menuGroupPath", {static: false}) menuGroupPath: BravoGroupPathComponent;
+  @ViewChild("menuGroupPath", { static: false }) menuGroupPath: BravoGroupPathComponent;
 
   ngOnInit() {
     this.getInitData();
@@ -54,14 +53,15 @@ export class WijmoGroupingComponent implements OnInit, AfterViewInit{
 
   public ngAfterViewInit() {
     // this.groupPath.itemsSource.push(new ToolStrip("0", null, "Vật tư 0000"));
-    
+    this.menuGroupPath.bMouseHoverDisable = true;
+
   }
 
   getInitData() {
     // this.cv.groupDescriptions.push(this.gd);
-    this.cv.groupDescriptions.push(new wjCore.PropertyGroupDescription('OpenAmount'));
+    this.cv.groupDescriptions.push(new wjCore.PropertyGroupDescription('ItemCode'));
     this.userService.getData().subscribe(data => {
-      this._dataSources = data.splice(0, 1000);
+      this._dataSources = data.splice(0, 10000);
       this.cv.sourceCollection = this._dataSources;
 
       let _item = data[0];
@@ -95,9 +95,13 @@ export class WijmoGroupingComponent implements OnInit, AfterViewInit{
     }
     this.cv.groupDescriptions.forEach((item, idx) => {
       if (item.propertyName === event.target.value) {
+        this.brGroupPath.removeControl(this.menuGroupPath, item.propertyName);
         this.cv.groupDescriptions.splice(idx, 1);
+        return;
       }
+      
     })
+    
   }
 
   checkgroupDes(col: string): boolean {
@@ -113,24 +117,23 @@ export class WijmoGroupingComponent implements OnInit, AfterViewInit{
   flexInitialized(flex: wjGrid.FlexGrid) {
     flex.itemsSource = this.cv;
     this.brGroupPath = new BravoGrouppath(document.createElement('div'), flex);
-    this.brGroupPath.show(flex)
     flex.selectionChanged.addHandler((s, e: wjGrid.FormatItemEventArgs) => {
       let _row = flex.selectedRows[0];
       if (!isNullOrUndefined(_row) && this.cv.groupDescriptions.length > 0) {
         this._parentNodeList = [];
-        this.getAllNodeIsLevel(_row, this._dropDownList, this._parentNodeList);
+        // this.getAllNodeIsLevel(_row, this._dropDownList, this._parentNodeList);
         // this.setVisibleDropDown(this._parentNodeList, this._dropDownList);
         // this.setHeaderDisplay(this._dropDownList, this._parentNodeList);
-        // this.brGroupPath._setDropDownItems(_row)
-        this.getNodeChild(_row, this._dropDownList, 0,0,0);
-        console.log(this._dropDownList[0])
+        this.brGroupPath.setComboBoxItems(_row, this.menuGroupPath)
+        // this.getNodeChild(_row, this._dropDownList, 0, 0, 0);
       }
+      console.log(flex)
     })
 
     flex.loadedRows.addHandler((s) => {
-     
-      this.dropDownChanged(this._dropDownList, this.cv, this.hostElem);
-      // this.brGroupPath.createNewGroupPath(this.menuGroupPath, this.cv);
+
+      // this.dropDownChanged(this._dropDownList, this.cv, this.hostElem);
+      this.brGroupPath.createNewGroupPath(this.menuGroupPath);
       // this.setVisibleDropDown(this._parentNodeList, this._dropDownList);
     })
 
@@ -180,8 +183,6 @@ export class WijmoGroupingComponent implements OnInit, AfterViewInit{
       this.menuGroupPath.itemsSource.push(_dropDown)
     })
 
-    console.log(this.brGroupPath.dropDownList)
-    console.log(this.menuGroupPath.itemsSource);
   }
 
   private setVisibleDropDown(pParentNodeList: any, pDropDownList: any) {
@@ -228,7 +229,7 @@ export class WijmoGroupingComponent implements OnInit, AfterViewInit{
 
     for (let i = 0; i < _nLenParentNode; i++) {
       // First load item to dropdown
-      if (pDropDownList[0].itemsSource === undefined) {
+      if (pDropDownList[0] === undefined) {
         _nIndex = 0;
 
         this.getNodeChild(pRow, this._dropDownList, _nIndex, 0, 0);
@@ -261,11 +262,7 @@ export class WijmoGroupingComponent implements OnInit, AfterViewInit{
   }
 
   public getNodeChild(pRow, pDropDownList: any, pnIndex: number, pnIdxDropDown: number, pLevel: number) {
-    pDropDownList.push(new wjInput.ComboBox(document.createElement('div')));
     // travel find node is group row from parent node position
-    let _drop = new wjInput.ComboBox(document.createElement('div'));
-    let _item = []
-    console.log(pDropDownList[0])
     for (let i = pnIndex; i < pRow.grid.rows.length; i++) {
       let _thisRow = pRow.grid.rows[i];
 
@@ -278,13 +275,13 @@ export class WijmoGroupingComponent implements OnInit, AfterViewInit{
       // Add row group of level to dropdown
       if (_thisLevel === pLevel) {
         i += _thisRow.dataItem.items.length;
-        _item.push(new ToolStrip(_thisRow.index.toString(),null, _thisRow.dataItem.name.toString()));
-
-        // pDropDownList[pnIdxDropDown].header = pDropDownList[pnIdxDropDown].itemsSource[0].text.toString();
+        pDropDownList[pnIdxDropDown].itemsSource.push(new ToolStrip(
+          _thisRow.index.toString(),
+          document.createElement('div'),
+          _thisRow.dataItem.name.toString()
+        ));
       }
     }
-    pDropDownList[0].itemsSource = _item;
-    console.log(pDropDownList[0].itemsSource.length);
   }
 
   public getParentNode(row) {

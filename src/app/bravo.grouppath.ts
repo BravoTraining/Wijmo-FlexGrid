@@ -1,151 +1,203 @@
 import * as wjGrid from 'wijmo/wijmo.grid';
 import * as wjCore from 'wijmo/wijmo'
 
-import { DropDown } from './controller/dropdown';
 import { MenuStrip } from './controller/menustrip';
 import { isNull } from 'util';
 import { ToolStrip } from './lib/ui/toolstrip/toolstrip';
-import { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } from 'constants';
+import { ComboBox, Menu } from 'wijmo/wijmo.input';
 
-export class BravoGrouppath extends DropDown {
+export class BravoGrouppath extends ComboBox {
 
     hostElement: HTMLElement;
-    private _columnGroupList: string[];
-    private _grid: wjGrid.FlexGrid;
-    private _row: wjGrid.Row;
-    private _cv: wjCore.CollectionView;
-    private _groupColumnPos: number;
-    public dropDownList = [];
-    private _parentNodeOfItems = [];
+    public comboBoxList = [];
+    private _bIsAddItem = true;
+    private _bLoadNewParentRow = false;
+    private _flexGrid: wjGrid.FlexGrid;
 
-    constructor(hostEl: HTMLElement, pGrid: wjGrid.FlexGrid) {
+    readonly onLoadedRow = new wjCore.Event();
+
+    constructor(hostEl: HTMLElement, grid: wjGrid.FlexGrid) {
         super(hostEl);
-        this._grid = pGrid;
+        this._flexGrid = grid;
     }
 
 
-    public createNewGroupPath(pMenuStrip: MenuStrip, pCv: wjCore.CollectionView) {
-        let _nLenDropDown = this.dropDownList.length;
-        let _nLenCvGroupDes = pCv.groupDescriptions.length;
 
-        if (_nLenDropDown > _nLenCvGroupDes) {
-            for (let i = 0; i < _nLenDropDown; i++) {
-                if (i >= _nLenCvGroupDes) {
-                    this.dropDownList.splice(i,1);
-                    pMenuStrip.itemsSource.removeAt(i)
-                    pMenuStrip.itemsSource.removeAt(i)
+
+    public createNewGroupPath(pMenuStrip: MenuStrip) {
+           
+        //add new item to menustrip
+        // if (this.comboBoxList.length > 0 && this._bIsAddItem) {
+            let _comboBoxItem = new ComboBox(document.createElement('div'));
+            _comboBoxItem.displayMemberPath = "name";
+            _comboBoxItem.selectedValuePath = "index";
+            // _comboBoxItem.selectedIndexChanged.addHandler(() => {
+            //     let _value = _comboBoxItem.selectedValue;
+            //     flexGrid.select(new wjGrid.CellRange(_value, 0));
+            // }) 
+
+            this.comboBoxList.push(_comboBoxItem);
+
+            pMenuStrip.itemsSource.push(_comboBoxItem);
+            pMenuStrip.itemsSource.push(new ToolStrip("", null, ""));
+        // }
+
+        // load default items to menustrip
+        // if (this.comboBoxList.length == 0) {
+        //     pCv.groupDescriptions.forEach((groupDes) => {
+        //         let _comboBoxItem = new ComboBox(document.createElement('div'));
+        //         _comboBoxItem.displayMemberPath = "name";
+        //         _comboBoxItem.selectedValuePath = "index";
+
+        //         this.comboBoxList.push(_comboBoxItem);
+
+        //         pMenuStrip.itemsSource.push(_comboBoxItem);
+        //         pMenuStrip.itemsSource.push(new ToolStrip(groupDes.propertyName.toString(), null, ""));
+        //     })
+        // }
+
+        if (this._flexGrid.rows[0] instanceof (wjGrid.GroupRow)) {
+            let i = -1;
+            this._flexGrid.rows.forEach((row, _idx) => {
+                if (row.hasChildren == undefined) {
+                    i = _idx;
+                    console.log(i)
+                    return
                 }
+            })
+            this._flexGrid.select(i , 0);
+        }
+        
+         this._bIsAddItem = true;
+    }
+
+    public removeControl(pMenuStrip: MenuStrip, name: string) {
+        this._bIsAddItem = false;
+        let _index = pMenuStrip.itemsSource.findIndex( ctrl => {
+            if (ctrl instanceof ToolStrip) {
+                return ctrl.name === name
             }
-            return
-        }
-
-        //add new itemsource to menustrip
-        if (this.dropDownList.length > 0) {
-            let _dropDownItem = new DropDown(document.createElement('div'));
-            this.dropDownList.push(_dropDownItem);
-            pMenuStrip.itemsSource.push(_dropDownItem);
-            pMenuStrip.itemsSource.push(new ToolStrip('name', null, "12345"));
-            return;
-        }
-
-        pCv.groupDescriptions.forEach((groupDes) => {
-            let _dropDown = new DropDown(document.createElement('div'));
-            _dropDown.text = groupDes.propertyName;
-            _dropDown.displayMemberPath = "_name";
-            this.dropDownList.push(_dropDown);
-            pMenuStrip.itemsSource.push(_dropDown);
-            pMenuStrip.itemsSource.push(new ToolStrip('name', null, "12345"));
         })
 
+        if (_index !== -1) {
+            pMenuStrip.itemsSource.removeAt(_index);
+            pMenuStrip.itemsSource.removeAt(_index - 1);
+        }
+
+        this.comboBoxList.splice(Math.floor(_index/2), 1);
+        this._reIndexElement(_index - 1, pMenuStrip)
+
+        if (Math.floor(_index/2) === 0) this._bLoadNewParentRow = true;
     }
 
-    public _setDropDownItems(pRow) {
-        let _parentNodeOfItems = [];
+
+    public setComboBoxItems(pRow, pMenuStrip: MenuStrip) {
+        let _parentNodeOfRow = [];
         let _nIndex = -1;
-        this._getParentNodeOfItem(pRow, _parentNodeOfItems);
+        this._getParentNodeOfRow(pRow, _parentNodeOfRow);
 
-        _parentNodeOfItems.reverse();
-        let _nLenParentNode = _parentNodeOfItems.length
+        _parentNodeOfRow.reverse();
 
-        for (let i = 0; i < _nLenParentNode; i++) {
-            if (this.dropDownList[0].itemsSource.length === 0) {
-                this._getNodeChild(pRow, 0, 0, 0);
+        for (let i = 0; i < _parentNodeOfRow.length; i++) {
+            if (this.comboBoxList[0].itemsSource === undefined || this._bLoadNewParentRow) {
+                this.comboBoxList[0].itemsSource = this._getNodeChild(pRow, 0, 0);
 
-                if (this.dropDownList.length > 1) {
-                    this._getNodeChild(pRow, 1, 1, 1);
+                if (this.comboBoxList.length > 1) {
+                    this.comboBoxList[1].itemsSource = this._getNodeChild(pRow, 1, 1);
                 }
+                this._bLoadNewParentRow = false;
+                return;
             }
 
-            if (this.dropDownList[0].itemsSource.length !== 0) {
-                _nIndex = _parentNodeOfItems[i].index + 1;
+            if (this.comboBoxList[0].itemsSource !== undefined) {
+                _nIndex = _parentNodeOfRow[i].index + 1;
                 let _thisRow = pRow.grid.rows[_nIndex];
-                let _nCurrentLevel = _thisRow instanceof (wjGrid.GroupRow) ? _thisRow.level : null;
+                let _nCurrentLevel = _thisRow.hasChildren ? _thisRow.level : null;
 
                 if (_nCurrentLevel === null) {
                     continue;
                 }
 
-                // Remove all node old in dropdown item
-                if (i + 1 < this.dropDownList.length) {
-                    let _totalItems = this.dropDownList[i + 1].itemsSource.length;
-                    if (_totalItems > 0) {
-                        this.dropDownList[i + 1].itemsSource.splice(0, _totalItems);
+                // Remove all items old in combobox 
+                if (i + 1 < this.comboBoxList.length) {
+                    if (this.comboBoxList[i + 1].itemsSource !== undefined) {
+                        this.comboBoxList[i + 1].itemsSource = [];
                     }
-                    this._getNodeChild(pRow, i + 1, _nIndex, _nCurrentLevel);
+                    this.comboBoxList[i + 1].itemsSource = this._getNodeChild(pRow, _nIndex, _nCurrentLevel);
                 }
+            }
+        }
+        this._setVisibleDisplay(_parentNodeOfRow, pMenuStrip);
+    }
+
+
+    private _setVisibleDisplay(pParentNodeOfItem, pMenuStrip: MenuStrip) {
+        pParentNodeOfItem.forEach((_item, _idx) => {
+            this.comboBoxList[_idx].text = pParentNodeOfItem[_idx].dataItem.name.toString();
+        })
+
+        for (let _i = 0; _i < pMenuStrip.itemsSource.length; _i++) {
+            pMenuStrip.itemsSource[_i].hostElement.setAttribute("hidden", "true");
+            if (_i <= 2 * pParentNodeOfItem.length) {
+                pMenuStrip.itemsSource[_i].hostElement.removeAttribute("hidden");
             }
         }
     }
 
-    private _getNodeChild(pRow, pnIdxDropDown: number, pnIndexRow: number, pLevel: number) {
+    private _reIndexElement(pnIndex: number, pMenuStrip: MenuStrip) {
+           for (let _n = pnIndex; _n < pMenuStrip.itemsSource.length; _n++) {
+            let _element = pMenuStrip.itemsSource[_n].hostElement;
+            if (_element) _element.setAttribute('bravo-menustrip-index', _n.toString());
+        }
+    }
+
+    private _getNodeChild(pRow, pnIndexRow: number, pLevel: number) {
         // travel find node is group row from parent node position
+        let _item = [];
         for (let i = pnIndexRow; i < pRow.grid.rows.length; i++) {
             let _thisRow = pRow.grid.rows[i];
 
-            let _thisLevel = _thisRow instanceof (wjGrid.GroupRow) ? _thisRow.level : null;
+            let _thisLevel = _thisRow.hasChildren ? _thisRow.level : null;
 
             if (_thisLevel !== null && _thisLevel < pLevel) {
                 break;
             }
 
-            // Add row group of level to dropdown
+            // Add row group of level to combobox
             if (_thisLevel === pLevel) {
                 i += _thisRow.dataItem.items.length;
-                this.dropDownList[pnIdxDropDown].itemsSource.push(new ToolStrip(
-                    _thisRow.index.toString(),
-                    document.createElement('div'),
-                    _thisRow.dataItem.name.toString()
-                ));
-
+                _item.push(new Object({ index: _thisRow.index, name: _thisRow.dataItem.name }))
             }
         }
+        return _item;
     }
 
-    private _getParentNodeOfItem(pRow, pParentNodeOfItem: any) {
-        if (pRow instanceof (wjGrid.GroupRow)) {
+    private _getParentNodeOfRow(pRow, pParentNodeOfItem: any) {
+        if (pRow == null) {
+            return;
+        }
+
+        if (pRow.hasChildren) {
             pParentNodeOfItem.push(pRow);
             let parentNode = this.getParentNode(pRow);
-            this._getParentNodeOfItem(parentNode, pParentNodeOfItem);
+            this._getParentNodeOfRow(parentNode, pParentNodeOfItem);
         }
         else {
-            if (isNull(pRow)) {
-                return;
-            }
-
+        
             let parentNode = this.getParentNode(pRow);
-            this._getParentNodeOfItem(parentNode, pParentNodeOfItem);
+            this._getParentNodeOfRow(parentNode, pParentNodeOfItem);
         }
     }
 
     public getParentNode(pRow) {
         // get row level
-        let startLevel = pRow instanceof (wjGrid.GroupRow) ? pRow.level : null;
+        let startLevel = typeof(pRow.hasChildren) !== undefined && pRow.hasChildren ? pRow.level : null;
         let startIndex = pRow.index;
 
         // travel up to find parent node
         for (let i = startIndex - 1; i >= 0; i--) {
             let thisRow = pRow.grid.rows[i],
-                thisLevel = thisRow instanceof (wjGrid.GroupRow) ? thisRow.level : null;
+                thisLevel = thisRow.hasChildren ? thisRow.level : null;
 
             if (thisLevel != null) {
                 if (startLevel == null || (startLevel > -1 && thisLevel < startLevel))

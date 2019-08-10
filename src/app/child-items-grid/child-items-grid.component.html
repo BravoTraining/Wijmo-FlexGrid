@@ -13,6 +13,10 @@
         <button class="btn btn-primary" (click)="gridView()" *ngIf="isHidden">Grid View</button>
     </div>
 
+    <div id="menuGroupPath">
+
+    </div>
+
     <div class="tree-grid">
         <wj-flex-grid #childItem class="tree-grid" [(itemsSource)]="collectionView" [selectionMode]="'RowRange'" [headersVisibility]="'Column'" (initialized)="flexInitialized(flex)" [autoGenerateColumns]=false [allowAddNew]="true" [allowDelete]="true">
             <wj-flex-grid-column [header]="'Mã số'" [binding]="'ItemCode'"></wj-flex-grid-column>
