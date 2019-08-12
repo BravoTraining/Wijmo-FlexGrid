@@ -108,19 +108,28 @@ export class ChildItemsGridComponent implements OnInit, AfterViewInit {
 
   // @ViewChild('childItem') flex: wjcGrid.FlexGrid;
   @ViewChild('childItem', {static: true}) flex: wjcGrid.FlexGrid;
-  @ViewChild('menuGroupPath', {static: true}) menu: BravoGroupPathComponent;
+  @ViewChild('menuGroupPath', {static: false}) menu: BravoGroupPathComponent;
 
   flexInitialized(flexgrid: wjcGrid.FlexGrid) {
     flexgrid.mergeManager = new CustomMergeManager(flexgrid);
     flexgrid.childItemsPath = "children";
-    this.brGroupPath = new BravoGrouppath(document.createElement('div'), flexgrid);
+    this.brGroupPath = new BravoGrouppath(document.createElement('div'), flexgrid, 1);
     // flexgrid.isReadOnly = false;
     this.loadedRows();
     this.mergeHeader(flexgrid);
     this.formatItem();
 
     flexgrid.loadedRows.addHandler(() => {
-      this.brGroupPath.createNewGroupPath(this.menu);
+      // this.brGroupPath.createNewGroupPath(this.menu);
+
+      // flexgrid.rows.forEach((row) => {
+        // console.log(row instanceof wjcGrid.GroupRow)
+      // })
+    })
+
+    flexgrid.selectionChanged.addHandler(() => {
+      let _row = flexgrid.selectedRows[0];
+      this.brGroupPath.setComboBoxItems(_row, this.menu);
     })
   }
 
@@ -229,13 +238,13 @@ export class ChildItemsGridComponent implements OnInit, AfterViewInit {
   treeView() {
     this.buildTreeFromCollection(this.collectionView);
     this.isHidden = !this.isHidden;
-    this.flex.rows.forEach((row) => {
-      if (row.hasChildren) {
-        console.log(row);
-      }
+    // this.flex.rows.forEach((row) => {
+    //   if (row.hasChildren) {
+    //     console.log(row);
+    //   }
       
       
-    })
+    // })
   }
 
   gridView() {
@@ -248,6 +257,7 @@ export class ChildItemsGridComponent implements OnInit, AfterViewInit {
     this.userService.getData().subscribe(data => {
       this.data = data;
       this.collectionView = new wjcCore.CollectionView(this.data);
+      this.buildTreeFromCollection(this.collectionView);
       
     })
   }

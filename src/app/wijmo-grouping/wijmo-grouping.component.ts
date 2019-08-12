@@ -95,7 +95,7 @@ export class WijmoGroupingComponent implements OnInit, AfterViewInit {
     }
     this.cv.groupDescriptions.forEach((item, idx) => {
       if (item.propertyName === event.target.value) {
-        this.brGroupPath.removeControl(this.menuGroupPath, item.propertyName);
+        // this.brGroupPath.removeControl(this.menuGroupPath, item.propertyName);
         this.cv.groupDescriptions.splice(idx, 1);
         return;
       }
@@ -116,24 +116,23 @@ export class WijmoGroupingComponent implements OnInit, AfterViewInit {
 
   flexInitialized(flex: wjGrid.FlexGrid) {
     flex.itemsSource = this.cv;
-    this.brGroupPath = new BravoGrouppath(document.createElement('div'), flex);
+    this.brGroupPath = new BravoGrouppath(document.createElement('div'), flex, -1);
     flex.selectionChanged.addHandler((s, e: wjGrid.FormatItemEventArgs) => {
       let _row = flex.selectedRows[0];
-      if (!isNullOrUndefined(_row) && this.cv.groupDescriptions.length > 0) {
+      // if (!isNullOrUndefined(_row) && this.cv.groupDescriptions.length > 0) {
         this._parentNodeList = [];
         // this.getAllNodeIsLevel(_row, this._dropDownList, this._parentNodeList);
         // this.setVisibleDropDown(this._parentNodeList, this._dropDownList);
         // this.setHeaderDisplay(this._dropDownList, this._parentNodeList);
         this.brGroupPath.setComboBoxItems(_row, this.menuGroupPath)
         // this.getNodeChild(_row, this._dropDownList, 0, 0, 0);
-      }
-      console.log(flex)
+      // }
     })
 
     flex.loadedRows.addHandler((s) => {
 
       // this.dropDownChanged(this._dropDownList, this.cv, this.hostElem);
-      this.brGroupPath.createNewGroupPath(this.menuGroupPath);
+      // this.brGroupPath.createNewGroupPath(this.menuGroupPath);
       // this.setVisibleDropDown(this._parentNodeList, this._dropDownList);
     })
 
