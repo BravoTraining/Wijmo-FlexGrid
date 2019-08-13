@@ -27,6 +27,7 @@ import { SafehtmlPipe } from './PipeCustomer/safehtml.pipe';
 import { WijmoGroupingComponent } from './wijmo-grouping/wijmo-grouping.component';
 
 import { BravoGroupPathComponent } from './bravo-group-path/bravo-group-path.component'
+import { BravoWebGrid } from './lib/ui/controls/bravo.web.grid'
 
 
 
@@ -43,7 +44,8 @@ import { BravoGroupPathComponent } from './bravo-group-path/bravo-group-path.com
     ChildItemsGridComponent,
     SafehtmlPipe,
     WijmoGroupingComponent,
-    BravoGroupPathComponent
+    BravoGroupPathComponent,
+    BravoWebGrid
   ],
   imports: [
     BrowserModule,

@@ -14,6 +14,8 @@ import { ToolStrip } from '../lib/ui/toolstrip/toolstrip';
 import { BravoGroupPathComponent } from '../bravo-group-path/bravo-group-path.component'
 import { _DonutSegment } from 'wijmo/wijmo.chart';
 import { BravoGrouppath } from '../bravo.grouppath';
+import { BravoWebGrid, GroupColumnItem } from '../lib/ui/controls/bravo.web.grid';
+import { Dictionary, SortOrder, AggregateEnum } from '../lib/core/core';
 
 
 @Component({
@@ -59,7 +61,7 @@ export class WijmoGroupingComponent implements OnInit, AfterViewInit {
 
   getInitData() {
     // this.cv.groupDescriptions.push(this.gd);
-    this.cv.groupDescriptions.push(new wjCore.PropertyGroupDescription('ItemCode'));
+    // this.cv.groupDescriptions.push(new wjCore.PropertyGroupDescription('ItemCode'));
     this.userService.getData().subscribe(data => {
       this._dataSources = data.splice(0, 10000);
       this.cv.sourceCollection = this._dataSources;
@@ -95,7 +97,6 @@ export class WijmoGroupingComponent implements OnInit, AfterViewInit {
     }
     this.cv.groupDescriptions.forEach((item, idx) => {
       if (item.propertyName === event.target.value) {
-        // this.brGroupPath.removeControl(this.menuGroupPath, item.propertyName);
         this.cv.groupDescriptions.splice(idx, 1);
         return;
       }
@@ -114,192 +115,24 @@ export class WijmoGroupingComponent implements OnInit, AfterViewInit {
   }
 
 
-  flexInitialized(flex: wjGrid.FlexGrid) {
+  flexInitialized(flex: BravoWebGrid) {
     flex.itemsSource = this.cv;
+    
     this.brGroupPath = new BravoGrouppath(document.createElement('div'), flex, -1);
     flex.selectionChanged.addHandler((s, e: wjGrid.FormatItemEventArgs) => {
       let _row = flex.selectedRows[0];
-      // if (!isNullOrUndefined(_row) && this.cv.groupDescriptions.length > 0) {
-        this._parentNodeList = [];
-        // this.getAllNodeIsLevel(_row, this._dropDownList, this._parentNodeList);
-        // this.setVisibleDropDown(this._parentNodeList, this._dropDownList);
-        // this.setHeaderDisplay(this._dropDownList, this._parentNodeList);
         this.brGroupPath.setComboBoxItems(_row, this.menuGroupPath)
-        // this.getNodeChild(_row, this._dropDownList, 0, 0, 0);
-      // }
+
     })
 
+    flex.groupBy("ItemName");
+    flex.groupBy("Unit");
+    flex.groupBy("OpenInventory");
+    
     flex.loadedRows.addHandler((s) => {
+      this.brGroupPath.setSelectedRow(flex);
+      console.log(flex)
 
-      // this.dropDownChanged(this._dropDownList, this.cv, this.hostElem);
-      // this.brGroupPath.createNewGroupPath(this.menuGroupPath);
-      // this.setVisibleDropDown(this._parentNodeList, this._dropDownList);
     })
-
   }
-
-
-  private dropDownChanged(pDropDownList: any, pCollectionView: wjCore.CollectionView, pHostElem: HTMLElement) {
-    let _lenDropDown = pDropDownList.length;
-    let _lenGroupDes = pCollectionView.groupDescriptions.length;
-
-    if (_lenDropDown === 1 && _lenGroupDes === 0) {
-      pDropDownList.splice(0, 1);
-      pHostElem.removeChild(pHostElem.childNodes[0]);
-      return;
-    }
-    // remove group
-    if (_lenDropDown > _lenGroupDes) {
-      for (let i = 0; i < _lenDropDown; i++) {
-        if (pDropDownList[i].text !== pCollectionView.groups[i].name) {
-          pDropDownList.splice(i, 1);
-          this.menuGroupPath.itemsSource.splice(i, 1)
-          pHostElem.removeChild(pHostElem.childNodes[i]);
-          break
-        }
-      }
-      return;
-    }
-
-    // add new group
-    if (pDropDownList.length !== 0 && _lenGroupDes > 0) {
-      let _dropDown = new wjInput.ComboBox(document.createElement('div'));
-      // _dropDown.text = pCollectionView.groupDescriptions[pCollectionView.groupDescriptions.length - 1].propertyName;
-      pHostElem.appendChild(_dropDown.hostElement);
-      pDropDownList.push(_dropDown);
-      this.menuGroupPath.itemsSource.push(_dropDown)
-
-      return;
-    }
-
-    // load group default
-    pCollectionView.groupDescriptions.forEach((groupDes) => {
-      let _dropDown = new wjInput.ComboBox(document.createElement('div'));
-      // _dropDown.text = groupDes.propertyName;
-      _dropDown.displayMemberPath = "text";
-      pHostElem.appendChild(_dropDown.hostElement);
-      pDropDownList.push(_dropDown);
-      this.menuGroupPath.itemsSource.push(_dropDown)
-    })
-
-  }
-
-  private setVisibleDropDown(pParentNodeList: any, pDropDownList: any) {
-    for (let i = 0; i < pDropDownList.length; i++) {
-      pDropDownList[i].hostElement.removeAttribute("hidden");
-      if (i <= pParentNodeList.length) {
-        continue;
-      }
-      pDropDownList[i].hostElement.setAttribute("hidden", "true");
-    }
-  }
-
-  private setHeaderDisplay(pDropDownList: any, pParentNodeList) {
-    for (let i = 0; i < pParentNodeList.length; i++) {
-      pDropDownList[pParentNodeList.length - 1 - i].header = pParentNodeList[i].dataItem.name.toString();
-    }
-  }
-
-  public getAllGroupRow(pRow, pParentNodeList: any) {
-    if (pRow instanceof (wjGrid.GroupRow)) {
-      pParentNodeList.push(pRow);
-      let parentNode = this.getParentNode(pRow);
-      this.getAllGroupRow(parentNode, pParentNodeList);
-    }
-    else {
-      if (isNull(pRow)) {
-        return;
-      }
-
-      let parentNode = this.getParentNode(pRow);
-      this.getAllGroupRow(parentNode, pParentNodeList);
-    }
-  }
-
-  public getAllNodeIsLevel(pRow, pDropDownList: any, pParentNodeList: any) {
-    this.getAllGroupRow(pRow, pParentNodeList);
-
-    if (pParentNodeList.length === 0) {
-      return;
-    }
-
-    let _nIndex = -1;
-    let _nLenParentNode = pParentNodeList.length;
-
-    for (let i = 0; i < _nLenParentNode; i++) {
-      // First load item to dropdown
-      if (pDropDownList[0] === undefined) {
-        _nIndex = 0;
-
-        this.getNodeChild(pRow, this._dropDownList, _nIndex, 0, 0);
-
-        if (pDropDownList.length > 1) {
-          this.getNodeChild(pRow, this._dropDownList, _nIndex, 1, 1);
-        }
-      }
-
-      if (this._dropDownList[0].itemsSource.length !== 0) {
-        _nIndex = pParentNodeList[i].index + 1;
-        //get level current
-        let _thisRow = pRow.grid.rows[_nIndex];
-        let _currentLevel = _thisRow instanceof (wjGrid.GroupRow) ? _thisRow.level : null;
-
-        if (_currentLevel === null) {
-          continue;
-        }
-
-        // Remove all node old in dropdown item
-        let _totalItems = this._dropDownList[_nLenParentNode - i].itemsSource.length;
-        if (_totalItems > 0) {
-          this._dropDownList[_nLenParentNode - i].itemsSource.splice(0, _totalItems);
-        }
-
-        // Add new item to dropdown
-        this.getNodeChild(pRow, this._dropDownList, _nIndex, _nLenParentNode - i, _currentLevel);
-      }
-    }
-  }
-
-  public getNodeChild(pRow, pDropDownList: any, pnIndex: number, pnIdxDropDown: number, pLevel: number) {
-    // travel find node is group row from parent node position
-    for (let i = pnIndex; i < pRow.grid.rows.length; i++) {
-      let _thisRow = pRow.grid.rows[i];
-
-      let _thisLevel = _thisRow instanceof (wjGrid.GroupRow) ? _thisRow.level : null;
-
-      if (_thisLevel !== null && _thisLevel < pLevel) {
-        break;
-      }
-
-      // Add row group of level to dropdown
-      if (_thisLevel === pLevel) {
-        i += _thisRow.dataItem.items.length;
-        pDropDownList[pnIdxDropDown].itemsSource.push(new ToolStrip(
-          _thisRow.index.toString(),
-          document.createElement('div'),
-          _thisRow.dataItem.name.toString()
-        ));
-      }
-    }
-  }
-
-  public getParentNode(row) {
-    // get row level
-    let startLevel = row instanceof (wjGrid.GroupRow) ? row.level : null;
-    let startIndex = row.index;
-
-    // travel up to find parent node
-    for (let i = startIndex - 1; i >= 0; i--) {
-      let thisRow = row.grid.rows[i],
-        thisLevel = thisRow instanceof (wjGrid.GroupRow) ? thisRow.level : null;
-
-      if (thisLevel != null) {
-        if (startLevel == null || (startLevel > -1 && thisLevel < startLevel))
-          return thisRow;
-      }
-    }
-
-    // not found
-    return null;
-  };
 }

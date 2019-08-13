@@ -17,16 +17,17 @@
   </div>
 </div>
 
-<bravo-group-path #menuGroupPath>
-</bravo-group-path>
 
-<div id="menuControl">
+
+<div id="menuControl" style="flex: 1 1 20px; max-height: 20px">
+  <bravo-group-path #menuGroupPath>
+  </bravo-group-path>
 </div>
 
 
 <div>
-  <wj-flex-grid style="max-height: 500px" #flexGroup [selectionMode]="'Row'"
-    (initialized)="flexInitialized(flexGroup, groupMenu)">
+  <bravo-web-grid style="max-height: 500px" #flexGroup [selectionMode]="'Row'"
+    (initialized)="flexInitialized(flexGroup)">
     <wj-flex-grid-column *ngFor="let col of _columnAvailable" [binding]="col"></wj-flex-grid-column>
-  </wj-flex-grid>
+  </bravo-web-grid>
 </div>

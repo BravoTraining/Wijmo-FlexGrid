@@ -25,6 +25,7 @@
     "g": "^2.0.1",
     "ngx-bootstrap": "^5.0.0",
     "rxjs": "~6.4.0",
+    "stimulsoft-reports-js": "^2019.3.4",
     "stream": "0.0.2",
     "tslib": "^1.9.0",
     "wijmo": "^5.20191.615",

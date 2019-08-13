@@ -17,7 +17,7 @@
     </bravo-group-path>
 
     <div class="tree-grid">
-        <wj-flex-grid #childItem class="tree-grid" [(itemsSource)]="collectionView" [selectionMode]="'RowRange'" [headersVisibility]="'Column'" (initialized)="flexInitialized(flex)" [autoGenerateColumns]=false [allowAddNew]="true" [allowDelete]="true">
+        <bravo-web-grid #childItem class="tree-grid" [(itemsSource)]="collectionView" [selectionMode]="'RowRange'" [headersVisibility]="'Column'" (initialized)="flexInitialized(flex)" [autoGenerateColumns]=false [allowAddNew]="true" [allowDelete]="true">
             <wj-flex-grid-column [header]="'Mã số'" [binding]="'ItemCode'"></wj-flex-grid-column>
             <wj-flex-grid-column [header]="'Mặt hàng'" [binding]="'ItemName'" [width]=200></wj-flex-grid-column>
             <wj-flex-grid-column [header]="'Đvt'" [binding]="'Unit'" [width]=60 [allowMerging]=true></wj-flex-grid-column>
@@ -36,7 +36,7 @@
             </wj-flex-grid-column>
             <wj-flex-grid-column [header]="'Giá trị'" [binding]="'CloseAmount'"></wj-flex-grid-column>
 
-        </wj-flex-grid>
+        </bravo-web-grid>
     </div>
 
     <!-- <div style="margin-top: 30px">

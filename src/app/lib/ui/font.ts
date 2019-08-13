@@ -1,5 +1,5 @@
 import { BravoSettings } from './bravo.settings';
-// import { pxToPt } from './bravo.ui.extensions';
+import { pxToPt } from './bravo.ui.extensions';
 
 export class Font {
     private _fontFamily: any = 'Segoe UI';
@@ -36,6 +36,10 @@ export class Font {
         return this._textDecoration;
     }
 
+    public get Bold(): boolean {
+        return this.fontWeight == 'bolder';
+    }
+
     public get Italic(): boolean {
         return this.FontStyle == 'italic';
     }
@@ -65,6 +69,27 @@ export class Font {
         }
     }
 
+    public static getFontStyle(css: any) {
+        if (!css) FontStyle.Regular;
+
+        let _fontWeight = css['font-weight'];
+        if (_fontWeight == 'bold' || _fontWeight == 'bolder' ||
+            +_fontWeight > 500)
+            return FontStyle.Bold;
+
+        if (css['font-size'] == 'italic')
+            return FontStyle.Italic;
+
+        let _textDecoration = css['text-decoration'];
+        if (_textDecoration == 'underline')
+            return FontStyle.Underline;
+
+        if (_textDecoration == 'line-through')
+            return FontStyle.Strikeout;
+
+        return FontStyle.Regular;
+    }
+
     private _getFontSize(size: any): number {
         if (Number.isNumber(size))
             return size;
@@ -77,7 +102,7 @@ export class Font {
             let _nSize = Number.asNumber(_groups[1]);
             switch (_groups[2]) {
                 case 'px':
-                    // return pxToPt(_nSize);
+                    return pxToPt(_nSize);
 
                 case 'pt':
                     return _nSize;

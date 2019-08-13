@@ -1,0 +1,48 @@
+:host>>>.wj-colheaders .wj-state-multi-selected, :host>>>.wj-rowheaders .wj-state-multi-selected {
+    background-image: linear-gradient(rgb(255, 219, 112), rgb(255, 237, 112)) !important;
+    border-bottom: 1px solid #d4d4d4;
+}
+
+:host>>>.wj-cells .wj-state-multi-selected {
+    background-color: rgba(135, 206, 250, 0.4) !important;
+    color: #444 !important;
+    border-bottom-color: lightskyblue;
+    border-right-color: transparent;
+}
+
+:host>>>.wj-state-selected {
+    border: 1px dotted #d6d6d6;
+}
+
+/* :host >>> button.wj-elem-collapse{
+    padding: 0 !important;
+    min-width: 9px !important;
+    height: 9px ;
+    border-radius: 2px !important;
+    align-items: center;
+    place-content: center;
+    flex-direction: row;
+    border: 1px solid #999;
+    margin-right:  2px; 
+    opacity: 1;
+} */
+
+:host>>>button.wj-elem-collapse {
+    padding: 0;
+    opacity: 1 !important;
+}
+
+/* :host>>>button.wj-elem-collapse span {
+    height: 9px;
+    width: 9px;
+    vertical-align: middle;
+    color: #a4a4a4;
+    border: 1px solid #a4a4a4;
+    border-radius: 1px;
+    background-color: rgb(252, 252, 252)
+}
+
+:host>>>.wj-elem-collapse span {
+    font-size: 6px;
+    padding: 1px;
+} */

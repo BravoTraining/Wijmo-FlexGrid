@@ -7,6 +7,7 @@ import * as wjcCore from 'wijmo/wijmo';
 import { isNullOrUndefined } from 'util';
 import { BravoGroupPathComponent } from '../bravo-group-path/bravo-group-path.component';
 import { BravoGrouppath } from '../bravo.grouppath';
+import { BravoWebGrid } from '../lib/ui/controls/bravo.web.grid';
 
 class CustomMergeManager extends wjcGrid.MergeManager {
   constructor(flexGrid: wjcGrid.FlexGrid) {
@@ -107,20 +108,21 @@ export class ChildItemsGridComponent implements OnInit, AfterViewInit {
   }
 
   // @ViewChild('childItem') flex: wjcGrid.FlexGrid;
-  @ViewChild('childItem', {static: true}) flex: wjcGrid.FlexGrid;
+  @ViewChild('childItem', {static: true}) flex: BravoWebGrid;
   @ViewChild('menuGroupPath', {static: false}) menu: BravoGroupPathComponent;
 
   flexInitialized(flexgrid: wjcGrid.FlexGrid) {
     flexgrid.mergeManager = new CustomMergeManager(flexgrid);
     flexgrid.childItemsPath = "children";
     this.brGroupPath = new BravoGrouppath(document.createElement('div'), flexgrid, 1);
+    this.menu.bMouseHoverDisable = true;
     // flexgrid.isReadOnly = false;
     this.loadedRows();
     this.mergeHeader(flexgrid);
     this.formatItem();
 
     flexgrid.loadedRows.addHandler(() => {
-      // this.brGroupPath.createNewGroupPath(this.menu);
+      this.brGroupPath.setSelectedRow(flexgrid);
 
       // flexgrid.rows.forEach((row) => {
         // console.log(row instanceof wjcGrid.GroupRow)
