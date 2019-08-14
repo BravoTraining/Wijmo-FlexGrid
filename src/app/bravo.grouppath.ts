@@ -16,6 +16,8 @@ export class BravoGrouppath extends ComboBox {
     private _nTreeColumnPos: number;
     private _zGroupDes: string;
     private _zBinding = "";
+    private _parentNode = [];
+    private _bNotParent = false;
 
     readonly onLoadedRow = new wjCore.Event();
 
@@ -32,6 +34,25 @@ export class BravoGrouppath extends ComboBox {
     public createNewGroupPath(pMenuStrip: MenuStrip, pParentNodeOfRow: any, pRow) {
 
         let _nLenParentNode = pParentNodeOfRow.length;
+        // if (this._bIsAddItem && _nLenParentNode > 0) {
+        //     let _zTextDisplay = "";
+
+        //     if (this._nTreeColumnPos == -1) {
+        //         _zTextDisplay = pParentNodeOfRow[pParentNodeOfRow.length - 1].dataItem.name.toString();
+        //     }
+        //     else {
+        //         _zTextDisplay = pParentNodeOfRow[pParentNodeOfRow.length - 1].dataItem[this._zBinding];
+        //     }
+
+        //     if (_zTextDisplay === pMenuStrip.itemsSource[pMenuStrip.itemsSource.length - 1].text) {
+        //         return;
+        //     }
+
+        //     let _rowParent = this.getParentNode(pRow);
+        //     console.log(_rowParent)
+        //     console.log(pParentNodeOfRow[_nLenParentNode - 1])
+        // }
+
 
         let _nSpliceStart = 1;
         if (_nLenParentNode == 0 && this._nTreeColumnPos == -1) {
@@ -78,7 +99,7 @@ export class BravoGrouppath extends ComboBox {
         _parentNodeOfRow.reverse();
 
         if ((this._bLoadNewParentRow && _parentNodeOfRow.length > 0)
-            || this._nTreeColumnPos !== -1) {
+            || (this._bLoadNewParentRow && this._nTreeColumnPos !== -1)) {
             this.createNewGroupPath(pMenuStrip, _parentNodeOfRow, pRow);
             this.comboBoxList[0].itemsSource = this._getAllNodeLevelZero();
             this._bLoadNewParentRow = false;
@@ -86,7 +107,7 @@ export class BravoGrouppath extends ComboBox {
             this._setVisibleDisplay(_parentNodeOfRow, pMenuStrip);
             return;
         }
-
+        if (this._bNotParent){
         this.createNewGroupPath(pMenuStrip, _parentNodeOfRow, pRow);
 
         if (_parentNodeOfRow.length > 0 && this._nTreeColumnPos == -1
@@ -115,6 +136,7 @@ export class BravoGrouppath extends ComboBox {
         }
         this._setVisibleDisplay(_parentNodeOfRow, pMenuStrip);
     }
+    }
 
     public setSelectedRow(flexGrid: wjGrid.FlexGrid) {
         let _nIndex = -1;
@@ -128,7 +150,7 @@ export class BravoGrouppath extends ComboBox {
         flexGrid.select(new wjGrid.CellRange(_nIndex, 0));
     }
 
-    private _createItemMenuStrip(pMenuStrip: MenuStrip, pParentNodeOfRow?) {
+    private _createItemMenuStrip(pMenuStrip: MenuStrip) {
         let _comboBoxItem = new ComboBox(document.createElement('div'));
         _comboBoxItem.displayMemberPath = "name";
         _comboBoxItem.selectedValuePath = "index";
@@ -202,7 +224,7 @@ export class BravoGrouppath extends ComboBox {
         if (this._zBinding !== "") {
             this._flexGrid.rows.forEach((_item) => {
                 if (_item.hasChildren && _item.level === 0) {
-                    _parentNode.push(new Object({ index: _item.index, name: _item.dataItem[this._zBinding]}));
+                    _parentNode.push(new Object({ index: _item.index, name: _item.dataItem[this._zBinding] }));
                 }
             })
             return _parentNode;

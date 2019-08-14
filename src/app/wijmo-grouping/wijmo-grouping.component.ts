@@ -60,7 +60,7 @@ export class WijmoGroupingComponent implements OnInit, AfterViewInit {
   }
 
   getInitData() {
-    // this.cv.groupDescriptions.push(this.gd);
+    this.cv.groupDescriptions.push(this.gd);
     // this.cv.groupDescriptions.push(new wjCore.PropertyGroupDescription('ItemCode'));
     this.userService.getData().subscribe(data => {
       this._dataSources = data.splice(0, 10000);
@@ -125,14 +125,12 @@ export class WijmoGroupingComponent implements OnInit, AfterViewInit {
 
     })
 
-    flex.groupBy("ItemName");
-    flex.groupBy("Unit");
-    flex.groupBy("OpenInventory");
+    // flex.groupBy("ItemName");
+    // flex.groupBy("Unit");
+    // flex.groupBy("OpenInventory");
     
     flex.loadedRows.addHandler((s) => {
       this.brGroupPath.setSelectedRow(flex);
-      console.log(flex)
-
     })
   }
 }
