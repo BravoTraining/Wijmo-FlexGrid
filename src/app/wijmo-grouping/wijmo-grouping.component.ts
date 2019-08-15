@@ -54,13 +54,12 @@ export class WijmoGroupingComponent implements OnInit, AfterViewInit {
   }
 
   public ngAfterViewInit() {
-    // this.groupPath.itemsSource.push(new ToolStrip("0", null, "Vật tư 0000"));
     this.menuGroupPath.bMouseHoverDisable = true;
 
   }
 
   getInitData() {
-    this.cv.groupDescriptions.push(this.gd);
+    // this.cv.groupDescriptions.push(this.gd);
     // this.cv.groupDescriptions.push(new wjCore.PropertyGroupDescription('ItemCode'));
     this.userService.getData().subscribe(data => {
       this._dataSources = data.splice(0, 10000);
@@ -119,13 +118,14 @@ export class WijmoGroupingComponent implements OnInit, AfterViewInit {
     flex.itemsSource = this.cv;
     
     this.brGroupPath = new BravoGrouppath(document.createElement('div'), flex, -1);
+    // this.brGroupPath.dropDownCssClass = "bravo-drop-down";
     flex.selectionChanged.addHandler((s, e: wjGrid.FormatItemEventArgs) => {
       let _row = flex.selectedRows[0];
         this.brGroupPath.setComboBoxItems(_row, this.menuGroupPath)
 
     })
 
-    // flex.groupBy("ItemName");
+    flex.groupBy("ItemName");
     // flex.groupBy("Unit");
     // flex.groupBy("OpenInventory");
     

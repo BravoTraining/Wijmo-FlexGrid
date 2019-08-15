@@ -115,6 +115,8 @@ export class ChildItemsGridComponent implements OnInit, AfterViewInit {
     flexgrid.mergeManager = new CustomMergeManager(flexgrid);
     flexgrid.childItemsPath = "children";
     this.brGroupPath = new BravoGrouppath(document.createElement('div'), flexgrid, 1);
+    this.brGroupPath.dropDownCssClass = 'bravo-drop-down';
+    console.log(this.brGroupPath);
     this.menu.bMouseHoverDisable = true;
     // flexgrid.isReadOnly = false;
     this.loadedRows();
@@ -124,9 +126,6 @@ export class ChildItemsGridComponent implements OnInit, AfterViewInit {
     flexgrid.loadedRows.addHandler(() => {
       this.brGroupPath.setSelectedRow(flexgrid);
 
-      // flexgrid.rows.forEach((row) => {
-        // console.log(row instanceof wjcGrid.GroupRow)
-      // })
     })
 
     flexgrid.selectionChanged.addHandler(() => {

@@ -19,15 +19,15 @@
 
 
 
-<div id="menuControl">
-  <bravo-group-path #menuGroupPath>
+<div id="menuControl" class="bravo-form-menu">
+  <bravo-group-path #menuGroupPath class="bravo-menu-strip">
   </bravo-group-path>
 </div>
 
 
 <div>
-  <wj-flex-grid style="max-height: 500px" #flexGroup [selectionMode]="'Row'"
+  <bravo-web-grid style="max-height: 500px" #flexGroup [selectionMode]="'Row'"
     (initialized)="flexInitialized(flexGroup)">
     <wj-flex-grid-column *ngFor="let col of _columnAvailable" [binding]="col"></wj-flex-grid-column>
-  </wj-flex-grid>
+  </bravo-web-grid>
 </div>
