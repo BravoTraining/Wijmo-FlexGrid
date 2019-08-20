@@ -88,11 +88,7 @@
 .bravo-btn {
     background: none;
     border: none;
-    background-image: url(./right-arrow.svg);
-    height: 8px;
     min-width: 100%;
-    background-repeat: no-repeat;
-    background-position: center;
 }
 
 
@@ -134,7 +130,7 @@
     border-radius: 0 !important;
 }
 
-#_dropdown {
-    background-color: #f0f0f0 !important;
-    border-radius: 0 !important;
+.bravo-unselected {
+    background: none !important;
+    color: #000 !important;
 }
