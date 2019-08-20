@@ -19,8 +19,8 @@
     </div>
     
 
-    <div class="tree-grid" style="margin-top: 20px"> 
-        <bravo-web-grid #childItem class="tree-grid" [(itemsSource)]="collectionView" [selectionMode]="'RowRange'" [headersVisibility]="'Column'" (initialized)="flexInitialized(flex)" [autoGenerateColumns]=false [allowAddNew]="true" [allowDelete]="true">
+    <!-- <div class="tree-grid" style="margin-top: 20px"> 
+        <bravo-web-grid #childItem class="tree-grid" [(itemsSource)]="collectionView" [selectionMode]="'RowRange'" [headersVisibility]="'Column'" (initialized)="flexInitialized(childItem)" [autoGenerateColumns]="false" [allowAddNew]="true" [allowDelete]="true">
             <wj-flex-grid-column [header]="'Mã số'" [binding]="'ItemCode'"></wj-flex-grid-column>
             <wj-flex-grid-column [header]="'Mặt hàng'" [binding]="'ItemName'" [width]=200></wj-flex-grid-column>
             <wj-flex-grid-column [header]="'Đvt'" [binding]="'Unit'" [width]=60 [allowMerging]=true></wj-flex-grid-column>
@@ -39,6 +39,18 @@
             </wj-flex-grid-column>
             <wj-flex-grid-column [header]="'Giá trị'" [binding]="'CloseAmount'"></wj-flex-grid-column>
 
+        </bravo-web-grid>
+    </div> -->
+
+    <div class="tree-grid" style="margin-top: 20px"> 
+        <bravo-web-grid #childItem class="tree-grid" [(itemsSource)]="collectionView" [selectionMode]="'RowRange'" [headersVisibility]="'Column'" (initialized)="flexInitialized(flex)" [autoGenerateColumns]="false" [allowAddNew]="true" [allowDelete]="true">
+            <wj-flex-grid-column [header]="'Mã số'" [binding]="'ItemCode'"></wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Mặt hàng'" [binding]="'ItemName'" [width]=200></wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Đvt'" [binding]="'Unit'" [width]=60 [allowMerging]=true></wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Số lượng'" [binding]="'OpenInventory'" [width]=100 [allowMerging]=true>
+            </wj-flex-grid-column>
+            <wj-flex-grid-column [header]="'Giá trị'" [binding]="'OpenAmount'" [width]=100 [allowMerging]=true>
+            </wj-flex-grid-column>
         </bravo-web-grid>
     </div>
 

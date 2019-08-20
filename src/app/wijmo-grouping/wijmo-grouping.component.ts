@@ -13,7 +13,7 @@ import { DropDown } from '../controller/dropdown';
 import { ToolStrip } from '../lib/ui/toolstrip/toolstrip';
 import { BravoGroupPathComponent } from '../bravo-group-path/bravo-group-path.component'
 import { _DonutSegment } from 'wijmo/wijmo.chart';
-import { BravoGrouppath } from '../bravo.grouppath';
+import { BravoGrouppath } from '../BravoClass/bravo.grouppath';
 import { BravoWebGrid, GroupColumnItem } from '../lib/ui/controls/bravo.web.grid';
 import { Dictionary, SortOrder, AggregateEnum } from '../lib/core/core';
 
@@ -47,6 +47,7 @@ export class WijmoGroupingComponent implements OnInit, AfterViewInit {
   }
 
   @ViewChild("menuGroupPath", { static: false }) menuGroupPath: BravoGroupPathComponent;
+  @ViewChild("flexGroup", {static: false}) flex: BravoWebGrid;
 
   ngOnInit() {
     this.getInitData();
@@ -59,8 +60,6 @@ export class WijmoGroupingComponent implements OnInit, AfterViewInit {
   }
 
   getInitData() {
-    // this.cv.groupDescriptions.push(this.gd);
-    // this.cv.groupDescriptions.push(new wjCore.PropertyGroupDescription('ItemCode'));
     this.userService.getData().subscribe(data => {
       this._dataSources = data.splice(0, 10000);
       this.cv.sourceCollection = this._dataSources;
@@ -91,12 +90,22 @@ export class WijmoGroupingComponent implements OnInit, AfterViewInit {
 
   groupDescriptionChanged(event: any) {
     if (event.target.checked) {
-      this.cv.groupDescriptions.push(new wjCore.PropertyGroupDescription(event.target.value));
+      // this.cv.groupDescriptions.push(new wjCore.PropertyGroupDescription(event.target.value));
+      this.flex.collectionView.beginUpdate();
+
+      try{
+        this.flex.groupBy(event.target.value);
+      }
+      finally{
+        this.flex.collectionView.endUpdate();
+      }
+      
       return;
     }
     this.cv.groupDescriptions.forEach((item, idx) => {
       if (item.propertyName === event.target.value) {
-        this.cv.groupDescriptions.splice(idx, 1);
+        // this.cv.groupDescriptions.splice(idx, 1);
+        this.flex.clearGroup(event.target.value)
         return;
       }
       
@@ -117,20 +126,11 @@ export class WijmoGroupingComponent implements OnInit, AfterViewInit {
   flexInitialized(flex: BravoWebGrid) {
     flex.itemsSource = this.cv;
     
-    this.brGroupPath = new BravoGrouppath(document.createElement('div'), flex, -1);
-    // this.brGroupPath.dropDownCssClass = "bravo-drop-down";
-    flex.selectionChanged.addHandler((s, e: wjGrid.FormatItemEventArgs) => {
-      let _row = flex.selectedRows[0];
-        this.brGroupPath.setComboBoxItems(_row, this.menuGroupPath)
+    this.brGroupPath = new BravoGrouppath(this.menuGroupPath, flex);
 
-    })
-
-    flex.groupBy("ItemName");
+    // flex.groupBy("ItemName");
     // flex.groupBy("Unit");
     // flex.groupBy("OpenInventory");
-    
-    flex.loadedRows.addHandler((s) => {
-      this.brGroupPath.setSelectedRow(flex);
-    })
+
   }
 }

@@ -6,7 +6,7 @@ import * as wjcInput from 'wijmo/wijmo.input';
 import * as wjcCore from 'wijmo/wijmo';
 import { isNullOrUndefined } from 'util';
 import { BravoGroupPathComponent } from '../bravo-group-path/bravo-group-path.component';
-import { BravoGrouppath } from '../bravo.grouppath';
+import { BravoGrouppath } from '../BravoClass/bravo.grouppath';
 import { BravoWebGrid } from '../lib/ui/controls/bravo.web.grid';
 
 class CustomMergeManager extends wjcGrid.MergeManager {
@@ -107,31 +107,28 @@ export class ChildItemsGridComponent implements OnInit, AfterViewInit {
     
   }
 
-  // @ViewChild('childItem') flex: wjcGrid.FlexGrid;
-  @ViewChild('childItem', {static: true}) flex: BravoWebGrid;
+
+  @ViewChild('childItem', {static: false}) flex: BravoWebGrid;
   @ViewChild('menuGroupPath', {static: false}) menu: BravoGroupPathComponent;
 
-  flexInitialized(flexgrid: wjcGrid.FlexGrid) {
-    flexgrid.mergeManager = new CustomMergeManager(flexgrid);
+  flexInitialized(flexgrid: BravoWebGrid) {
+    // flexgrid.mergeManager = new CustomMergeManager(flexgrid);
+
+
     flexgrid.childItemsPath = "children";
-    this.brGroupPath = new BravoGrouppath(document.createElement('div'), flexgrid, 1);
-    this.brGroupPath.dropDownCssClass = 'bravo-drop-down';
-    console.log(this.brGroupPath);
+    // flexgrid.groupBy("ItemName");
+    flexgrid.zTreeColName = "ItemName";
+    flexgrid.zMakingTreeNodeKeyColName = "ItemName";
+    flexgrid.groupBy(flexgrid.zMakingTreeNodeKeyColName);
+
+    this.brGroupPath = new BravoGrouppath(this.menu, flexgrid);
     this.menu.bMouseHoverDisable = true;
-    // flexgrid.isReadOnly = false;
+
+
+
     this.loadedRows();
-    this.mergeHeader(flexgrid);
+    // this.mergeHeader(flexgrid);
     this.formatItem();
-
-    flexgrid.loadedRows.addHandler(() => {
-      this.brGroupPath.setSelectedRow(flexgrid);
-
-    })
-
-    flexgrid.selectionChanged.addHandler(() => {
-      let _row = flexgrid.selectedRows[0];
-      this.brGroupPath.setComboBoxItems(_row, this.menu);
-    })
   }
 
   mergeHeader(flexGrid: wjcGrid.FlexGrid) {
