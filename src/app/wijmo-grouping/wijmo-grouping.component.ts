@@ -61,7 +61,7 @@ export class WijmoGroupingComponent implements OnInit, AfterViewInit {
 
   getInitData() {
     this.userService.getData().subscribe(data => {
-      this._dataSources = data.splice(0, 10000);
+      this._dataSources = data.splice(0, 5000);
       this.cv.sourceCollection = this._dataSources;
 
       let _item = data[0];
@@ -91,21 +91,16 @@ export class WijmoGroupingComponent implements OnInit, AfterViewInit {
   groupDescriptionChanged(event: any) {
     if (event.target.checked) {
       // this.cv.groupDescriptions.push(new wjCore.PropertyGroupDescription(event.target.value));
-      this.flex.collectionView.beginUpdate();
-
-      try{
+  
         this.flex.groupBy(event.target.value);
-      }
-      finally{
-        this.flex.collectionView.endUpdate();
-      }
       
       return;
     }
     this.cv.groupDescriptions.forEach((item, idx) => {
       if (item.propertyName === event.target.value) {
         // this.cv.groupDescriptions.splice(idx, 1);
-        this.flex.clearGroup(event.target.value)
+        this.flex.clearGroup(event.target.value);
+
         return;
       }
       

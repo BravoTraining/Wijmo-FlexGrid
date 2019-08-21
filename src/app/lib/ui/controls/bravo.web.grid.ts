@@ -31,6 +31,7 @@ import { Enum } from '../components/bravo.decorator';
 import { GridCellInfo } from '../dto/grid.cell.info';
 import { getCellType, pxToPt } from '../bravo.ui.extensions';
 import { BravoGraphicsRenderer } from '../bravo.graphics.renderer';
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
 const NoDisplayPermissionContent: string = "●●●";
 const COLUMN_NAME_PATTERN_FORMAT = "(?:\\b){0}(?:\\b)";
@@ -82,6 +83,7 @@ export class BravoWebGrid extends WjFlexGrid implements IBravoControlBase {
 
     private _nContextCol = -1;
     private _nContextRow = -1;
+    public _bUpdated: boolean = false;
 
     //#region static method
 
@@ -1878,6 +1880,11 @@ export class BravoWebGrid extends WjFlexGrid implements IBravoControlBase {
     }
 
     onBeforeUpdateGroups = new wjc.Event();
+    onAfterUpdateGroups = new wjc.Event();
+
+    public raiseOnAfterUpdateGroups() {
+        this.onAfterUpdateGroups.raise(true);
+    }
 
     public updateGroup(pbIsSorted: boolean = false, pbRestoreLastNodeState: boolean = true): void {
         if (this.columns.length <= 0 || this.rows.length <= 0)
@@ -2036,13 +2043,14 @@ export class BravoWebGrid extends WjFlexGrid implements IBravoControlBase {
 
             if (!this.bManualSumForGroup) this.updateSumCols();
             if (this.bAllowGrandTotal) this.updateGrandTotalRow();
+            
         }
         finally {
             if (!_bLastUpdate) this.endUpdate();
-
+            this._bUpdated = true;
             this._bUpdateGroupFlag = false;
-
             this.raiseOnContentHeightChanged();
+            this.raiseOnAfterUpdateGroups();
         }
     }
 
