@@ -83,7 +83,6 @@ export class BravoWebGrid extends WjFlexGrid implements IBravoControlBase {
 
     private _nContextCol = -1;
     private _nContextRow = -1;
-    public _bUpdated: boolean = false;
 
     //#region static method
 
@@ -139,7 +138,7 @@ export class BravoWebGrid extends WjFlexGrid implements IBravoControlBase {
                     _cs.mergeWith(_cs1);
                 }
             }
-        }        
+        }
 
         return _cs;
     }
@@ -196,62 +195,18 @@ export class BravoWebGrid extends WjFlexGrid implements IBravoControlBase {
         return !this.isReadOnly;
     }
 
+    /**
+     * Gets or sets whether the user is allowed to edit grid contents.
+     */
     public set allowEditing(value: boolean) {
         this.isReadOnly = !value;
     }
 
-    private _nTreeColumnPos: number = -1;
-
-    public get nTreeColumnPos(): number {
-        if (this._nTreeColumnPos == -1 && this.zTreeColName)
-            this._nTreeColumnPos = this.columns.indexOf(this.zTreeColName) || 0;
-
-        return this._nTreeColumnPos;
-    }
-
-    public _bAllowGrandTotal: boolean = false;
-
-    /** Allow grand total row is display by sum numeric columns. */
-    public get bAllowGrandTotal(): boolean {
-        return this._bAllowGrandTotal;
-    }
-
-    public set bAllowGrandTotal(value: boolean) {
-        this._bAllowGrandTotal = value;
-    }
-
-    /** Allow column can be added or inserted by user. */
-    public bAllowAddingColumn: boolean = false;
-
-    /** Allow column can be deleted by user. */
-    public bAllowDeletingColumn: boolean = false;
-
-    /** Allow user to group data. */
-    public bAllowGrouping: boolean = true;
-
-    public get bAllowSorting(): boolean {
-        return this.allowSorting;
-    }
-
-    public set bAllowSorting(value: boolean) {
-        this.allowSorting = value;
-    }
-
-    private _expressionEvaluator: BravoExpressionEvaluator = null;
-
-    public get expressionEvaluator(): BravoExpressionEvaluator {
-        if (!this._expressionEvaluator)
-            this._expressionEvaluator = new BravoExpressionEvaluator();
-
-        return this._expressionEvaluator;
-    }
-
-    public set expressionEvaluator(value: BravoExpressionEvaluator) {
-        this._expressionEvaluator = value;
-    }
-
     private _autoFitRowHeight: GridAutoFitRowHeightEnum = GridAutoFitRowHeightEnum.None;
 
+    /**
+     * Auto fit height of rows to their contents when they are drawn.
+     */
     @Enum(GridAutoFitRowHeightEnum)
     public get autoFitRowHeight(): GridAutoFitRowHeightEnum {
         return this._autoFitRowHeight;
@@ -263,6 +218,9 @@ export class BravoWebGrid extends WjFlexGrid implements IBravoControlBase {
 
     private _autoTextMode: GridAutoTextContentEnum = GridAutoTextContentEnum.Fixed;
 
+    /**
+     * Indicate which cell content will be translated autotext automatically.
+     */
     @Enum(GridAutoTextContentEnum)
     public get autoTextMode(): GridAutoTextContentEnum {
         return this._autoTextMode;
@@ -272,40 +230,150 @@ export class BravoWebGrid extends WjFlexGrid implements IBravoControlBase {
         this._autoTextMode = value;
     }
 
+    private _allowBuiltInContextMenu = GridBuiltInContextMenuEnum.Automatic;
+
+    /**
+     * Allow showing builtin context menu when user clicks right mouse button on some special areas in grid.
+     */
+    @Enum(GridBuiltInContextMenuEnum)
+    public get allowBuiltInContextMenu(): GridBuiltInContextMenuEnum {
+        return this._allowBuiltInContextMenu;
+    }
+
+    public set allowBuiltInContextMenu(value: GridBuiltInContextMenuEnum) {
+        value = asEnum(value, GridBuiltInContextMenuEnum);
+        if (this._allowBuiltInContextMenu != value)
+            this._allowBuiltInContextMenu = value;
+    }
+
+    /**
+     * Handle Enter key in editing mode to auto find and move to next editable cell when finish editing at current cell.
+     */
+    public get bHandleEnterKeyEdit(): boolean {
+        return this.keyActionEnter == wjg.KeyAction.CycleOut;
+    }
+
+    public set bHandleEnterKeyEdit(value: boolean) {
+        if (this.keyActionEnter == wjg.KeyAction.CycleOut)
+            return;
+
+        this.keyActionEnter = value ? wjg.KeyAction.CycleOut : wjg.KeyAction.None;
+    }
+
+    public _bAllowGrandTotal: boolean = false;
+
+    /** 
+     * Allow grand total row is display by sum numeric columns. 
+     */
+    public get bAllowGrandTotal(): boolean {
+        return this._bAllowGrandTotal;
+    }
+
+    public set bAllowGrandTotal(value: boolean) {
+        this._bAllowGrandTotal = value;
+    }
+
+    private _bAllowAddingColumn: boolean = false;
+
+    /**
+     *  Allow column can be added or inserted by user. 
+     */
+    public get bAllowAddingColumn(): boolean {
+        return this._bAllowAddingColumn;
+    }
+
+    public set bAllowAddingColumn(value: boolean) {
+        this._bAllowAddingColumn = value;
+    }
+
+    private _bAllowDeletingColumn: boolean = false;
+
+    /** 
+     * Allow column can be deleted by user. 
+     */
+    public get bAllowDeletingColumn(): boolean {
+        return this._bAllowDeletingColumn;
+    }
+
+    public set bAllowDeletingColumn(value: boolean) {
+        this._bAllowDeletingColumn = value;
+    }
+
+    private _bAllowGrouping: boolean = true;
+
+    /** 
+     * Allow user to group data. 
+     */
+    public get bAllowGrouping(): boolean {
+        return this._bAllowGrouping;
+    }
+
+    public set bAllowGrouping(value: boolean) {
+        this._bAllowGrouping = value;
+    }
+
+    /**
+     * Allow user to sort data at indicated column.
+     */
+    public get bAllowSorting(): boolean {
+        return this.allowSorting;
+    }
+
+    public set bAllowSorting(value: boolean) {
+        this.allowSorting = value;
+    }
+
+    private _bAllowRaisingUpdateGroupsEvents = false;
+
+    /**
+     * Determine whether onBeforeUpdateGroups/onAfterUpdateGroups events will be raised or not.
+     */
+    public get bAllowRaisingUpdateGroupsEvents(): boolean {
+        return this._bAllowRaisingUpdateGroupsEvents;
+    }
+
+    public set bAllowRaisingUpdateGroupsEvents(val: boolean) {
+        this._bAllowRaisingUpdateGroupsEvents = val;
+    }
+
+    private _bMarkDataRowState: boolean = false;
+
+    /**
+     * Color mark row header for error and changed data rows.
+     */
+    public get bMarkDataRowState(): boolean {
+        return this._bMarkDataRowState;
+    }
+
+    public set bMarkDataRowState(value: boolean) {
+        this._bAllowAddingColumn = value;
+    }
+
+    private _bManualSumForGroup: boolean = false;
+
     /**
      * Indicate manual handle sum total for subtotal nodes.
      */
-    public bManualSumForGroup: boolean = false;
-
-    private _hideZeroValue: GridDataCellEnum = GridDataCellEnum.Bound;
-
-    @Enum(GridDataCellEnum)
-    public get hideZeroValue(): GridDataCellEnum {
-        return this._hideZeroValue;
+    public get bManualSumForGroup(): boolean {
+        return this._bManualSumForGroup;
     }
 
-    public set hideZeroValue(value: GridDataCellEnum) {
-        this._hideZeroValue = value;
+    public set bManualSumForGroup(value: boolean) {
+        this._bManualSumForGroup = value;
     }
 
-    private _sumColumns: Dictionary<string, string> = null;
+    private _bGroupInColumn = false;
 
-    public get sumColumns(): Dictionary<string, string> {
-        if (!this._sumColumns) {
-            this._sumColumns = new Dictionary();
-            this._sumColumns.add(BravoWebGrid.AllColumnValue, null);
-        }
-
-        return this._sumColumns;
+    /**
+     * Indicate grouping data by merging row at specified column.
+     */
+    public get bGroupInColumn(): boolean {
+        return this._bGroupInColumn;
     }
 
-    private _groups: Dictionary<string, GroupColumnItem> = null;
-
-    public get groups(): Dictionary<string, GroupColumnItem> {
-        if (this._groups == null)
-            this._groups = new Dictionary<string, GroupColumnItem>();
-
-        return this._groups;
+    public set bGroupInColumn(value: boolean) {
+        if (this._bGroupInColumn == value) return;
+        this._bGroupInColumn = value;
     }
 
     protected _bDrawContentBorders: boolean = false;
@@ -334,6 +402,44 @@ export class BravoWebGrid extends WjFlexGrid implements IBravoControlBase {
         this._bContentBorderForColumnHeaders = value;
     }
 
+    private _bCreateTreeNodeAsSubtotal: boolean = true;
+
+    /**
+     * Apply subtotal style for created tree node and not binding to data source.
+     */
+    public get bCreateTreeNodeAsSubtotal(): boolean {
+        return this._bCreateTreeNodeAsSubtotal;
+    }
+
+    public set bCreateTreeNodeAsSubtotal(value: boolean) {
+        this._bCreateTreeNodeAsSubtotal = value;
+    }
+
+    private _bHeaderNumberingAutoSize: boolean = false;
+
+    /**
+     * Auto fit column width to header numbering content.
+     */
+    public get bHeaderNumberingAutoSize(): boolean {
+        return this._bHeaderNumberingAutoSize;
+    }
+
+    public set bHeaderNumberingAutoSize(value: boolean) {
+        this._bHeaderNumberingAutoSize = value;
+    }
+
+    private _contentBorderColor: wjc.Color = wjc.Color.fromString('#333'); //wjc.Color.fromString('#d4d4d4');
+
+    public get contentBorderColor(): wjc.Color {
+        return this._contentBorderColor;
+    }
+
+    public set contentBorderColor(value: wjc.Color) {
+        if (this._contentBorderColor.equals(value)) return;
+        this._contentBorderColor = value;
+        if (this.bDrawContentBorders) this.invalidate();
+    }
+
     /**
      * Determine whether total childs is displayed at group nodes or not.
      */
@@ -350,36 +456,89 @@ export class BravoWebGrid extends WjFlexGrid implements IBravoControlBase {
             this._countGroupChilds = value;
     }
 
-    private _allowBuiltInContextMenu = GridBuiltInContextMenuEnum.Automatic;
+    private _expressionEvaluator: BravoExpressionEvaluator = null;
 
-    @Enum(GridBuiltInContextMenuEnum)
-    public get allowBuiltInContextMenu(): GridBuiltInContextMenuEnum {
-        return this._allowBuiltInContextMenu;
+    public get expressionEvaluator(): BravoExpressionEvaluator {
+        if (!this._expressionEvaluator)
+            this._expressionEvaluator = new BravoExpressionEvaluator();
+
+        return this._expressionEvaluator;
     }
 
-    public set allowBuiltInContextMenu(value: GridBuiltInContextMenuEnum) {
-        value = asEnum(value, GridBuiltInContextMenuEnum);
-        if (this._allowBuiltInContextMenu != value)
-            this._allowBuiltInContextMenu = value;
+    public set expressionEvaluator(value: BravoExpressionEvaluator) {
+        this._expressionEvaluator = value;
     }
 
-    // public countGroupChilds: GridCountGroupChildEnum = GridCountGroupChildEnum.Hide;
+    private _groups: Dictionary<string, GroupColumnItem> = null;
+
+    public get groups(): Dictionary<string, GroupColumnItem> {
+        if (this._groups == null)
+            this._groups = new Dictionary<string, GroupColumnItem>();
+
+        return this._groups;
+    }
+
+    private _hideZeroValue: GridDataCellEnum = GridDataCellEnum.Bound;
+
+    @Enum(GridDataCellEnum)
+    public get hideZeroValue(): GridDataCellEnum {
+        return this._hideZeroValue;
+    }
+
+    public set hideZeroValue(value: GridDataCellEnum) {
+        this._hideZeroValue = value;
+    }
+
+    private _nTreeColumnPos: number = -1;
+
+    public get nTreeColumnPos(): number {
+        if (this._nTreeColumnPos == -1 && this.zTreeColName)
+            this._nTreeColumnPos = this.columns.indexOf(this.zTreeColName) || 0;
+
+        return this._nTreeColumnPos;
+    }
 
     /**
-     * Apply subtotal style for created tree node and not binding to data source.
+     * Indicate number of columns is frozen.
      */
-    public bCreateTreeNodeAsSubtotal: boolean = true;
-
-    private _contentBorderColor: wjc.Color = wjc.Color.fromString('#333'); //wjc.Color.fromString('#d4d4d4');
-
-    public get contentBorderColor(): wjc.Color {
-        return this._contentBorderColor;
+    public get nFreezeCols(): number {
+        return this.frozenColumns;
     }
 
-    public set contentBorderColor(value: wjc.Color) {
-        if (this._contentBorderColor.equals(value)) return;
-        this._contentBorderColor = value;
-        if (this.bDrawContentBorders) this.invalidate();
+    public set nFreezeCols(value: number) {
+        this.frozenColumns = value;
+    }
+
+    /**
+     * Indicate number of rows is frozen.
+     */
+    public get nFreezeRows(): number {
+        return this.frozenRows;
+    }
+
+    public set nFreezeRows(value: number) {
+        this.frozenRows = value;
+    }
+
+    private _nHeaderNumberingCol: number = -1;
+
+    public get nHeaderNumberingCol(): number {
+        return this._nHeaderNumberingCol;
+    }
+
+    public set nHeaderNumberingCol(value: number) {
+        this._nHeaderNumberingCol = value;
+    }
+
+    private _sumColumns: Dictionary<string, string> = null;
+
+    public get sumColumns(): Dictionary<string, string> {
+        if (!this._sumColumns) {
+            this._sumColumns = new Dictionary();
+            this._sumColumns.add(BravoWebGrid.AllColumnValue, null);
+        }
+
+        return this._sumColumns;
     }
 
     private _zTreeColName: string = null;
@@ -415,31 +574,6 @@ export class BravoWebGrid extends WjFlexGrid implements IBravoControlBase {
         this._zDataViewSortExprFormat = val;
     }
 
-    private _nFreezeCols: number = 0;
-
-    public get nFreezeCols(): number {
-        return this._nFreezeCols;
-    }
-
-    public set nFreezeCols(val: number) {
-        this._nFreezeCols = val;
-
-        if (this.columns.length > 0 && this._nFreezeCols < this.columns.length)
-            this.frozenColumns = this._nFreezeCols;
-    }
-
-    private _nFreezeRows: number = 0;
-
-    public get nFreezeRows(): number {
-        return this._nFreezeRows;
-    }
-
-    public set nFreezeRows(v: number) {
-        this._nFreezeRows = v;
-        if (this.rows.length > 0 && this._nFreezeRows < this.rows.length)
-            this.frozenRows = this._nFreezeRows;
-    }
-
     private _restrictedColumns: Dictionary<string, RestrictedColumnEnum> = null;
 
     public get restrictedColumns(): Dictionary<string, RestrictedColumnEnum> {
@@ -460,14 +594,13 @@ export class BravoWebGrid extends WjFlexGrid implements IBravoControlBase {
         this._rowHeaderNumbering = value;
     }
 
-    private _nHeaderNumberingCol: number = -1;
+    private _rowLayout: Array<any> = null;
 
-    public get nHeaderNumberingCol(): number {
-        return this._nHeaderNumberingCol;
-    }
+    public get rowLayout(): Array<any> {
+        if (this._rowLayout == null)
+            this._rowLayout = new Array();
 
-    public set nHeaderNumberingCol(value: number) {
-        this._nHeaderNumberingCol = value;
+        return this._rowLayout;
     }
 
     private _dynamicStyles: Array<DynamicStyleItem> = null;
@@ -492,16 +625,6 @@ export class BravoWebGrid extends WjFlexGrid implements IBravoControlBase {
 
     public get font(): Font {
         return this._font;
-    }
-
-    private _bAllowRaisingUpdateGroupsEvents = false;
-
-    public get bAllowRaisingUpdateGroupsEvents(): boolean {
-        return this._bAllowRaisingUpdateGroupsEvents;
-    }
-
-    public set bAllowRaisingUpdateGroupsEvents(val: boolean) {
-        this._bAllowRaisingUpdateGroupsEvents = val;
     }
 
     private _name: string = '';
@@ -588,40 +711,36 @@ export class BravoWebGrid extends WjFlexGrid implements IBravoControlBase {
         }
     }
 
-    private _oldColor: string = String.empty;
-    protected _bEnabled: boolean = false;
-
     public get enabled(): boolean {
-        return this._bEnabled;
+        return !this.isDisabled;
     }
 
     public set enabled(value: boolean) {
-        if (!this.hostElement) return;
+        if (this.isDisabled == !value)
+            return;
 
-        this._bEnabled = value;
-
-        let _css = getComputedStyle(this.hostElement);
-        if (this._oldColor != _css.backgroundColor) {
-            this._oldColor = _css.backgroundColor;
-
-            if (!value) this.hostElement.style.backgroundColor = "#d5d5d5";
-        }
+        this.isDisabled = !value;
     }
 
-    public text: string;
+    private _text: string;
 
-    private _bGroupInColumn = false;
-
-    public get bGroupInColumn(): boolean {
-        return this._bGroupInColumn;
+    public get text(): string {
+        return this._text;
     }
 
-    public set bGroupInColumn(value: boolean) {
-        if (this._bGroupInColumn == value) return;
-        this._bGroupInColumn = value;
+    public set text(value: string) {
+        this._text = value;
     }
 
-    public nNumericScale: number = 1;
+    private _nNumericScale: number = 1;
+
+    public get nNumericScale(): number {
+        return this._nNumericScale;
+    }
+
+    public set nNumericScale(value: number) {
+        this._nNumericScale = value;
+    }
 
     private _numericScaleUnit: NumericScaleUnitEnum = NumericScaleUnitEnum.None;
 
@@ -635,17 +754,24 @@ export class BravoWebGrid extends WjFlexGrid implements IBravoControlBase {
         this.nNumericScale = BravoNumericScale.getNumericScaleUnitValue(this._numericScaleUnit);
     }
 
-    public zNumericScaleFormat: string = "N2";
-    public zNumericScaleMember: string = String.empty;
+    private _zNumericScaleFormat: string = "N2";
 
-    private _bHeaderNumberingAutoSize: boolean = false;
-
-    public get bHeaderNumberingAutoSize(): boolean {
-        return this._bHeaderNumberingAutoSize;
+    public get zNumericScaleFormat(): string {
+        return this._zNumericScaleFormat;
     }
 
-    public set bHeaderNumberingAutoSize(value: boolean) {
-        this._bHeaderNumberingAutoSize = value;
+    public set zNumericScaleFormat(value: string) {
+        this._zNumericScaleFormat = value;
+    }
+
+    private _zNumericScaleMember: string = String.empty;
+
+    public get zNumericScaleMember(): string {
+        return this._zNumericScaleMember;
+    }
+
+    public set zNumericScaleMember(value: string) {
+        this._zNumericScaleMember = value;
     }
 
     private _mergedRanges: Array<wjg.CellRange> = null;
@@ -660,7 +786,15 @@ export class BravoWebGrid extends WjFlexGrid implements IBravoControlBase {
     /**
      * Custom text for grand total label.
      */
-    public zGrandTotalText: string = String.empty;
+    private _zGrandTotalText: string = String.empty;
+
+    public get zGrandTotalText(): string {
+        return this._zGrandTotalText;
+    }
+
+    public set zGrandTotalText(value: string) {
+        this._zGrandTotalText = value;
+    }
 
     public bExistsColumnWordWrap: boolean = false;
 
@@ -670,11 +804,11 @@ export class BravoWebGrid extends WjFlexGrid implements IBravoControlBase {
     * Determine whether position of grand total row is at top or bottom.
     */
     @Enum(SubtotalPositionEnum)
-    public get grandTotalPosition(): any {
+    public get grandTotalPosition(): SubtotalPositionEnum {
         return this._grandTotalPosition;
     }
 
-    public set grandTotalPosition(value: any) {
+    public set grandTotalPosition(value: SubtotalPositionEnum) {
         this._grandTotalPosition = value;
     }
 
@@ -690,6 +824,10 @@ export class BravoWebGrid extends WjFlexGrid implements IBravoControlBase {
     }
 
     //#endregion custom properties
+
+    public readonly onAfterUpdateGroups = new wjc.Event();
+
+    public readonly onBeforeUpdateGroups = new wjc.Event();
 
     public readonly evaluatingAutoTextCell = new Event();
     public onEvaluatingAutoTextCell(e?: wjg.FormatItemEventArgs) {
@@ -865,18 +1003,21 @@ export class BravoWebGrid extends WjFlexGrid implements IBravoControlBase {
         this.resizedRowNg
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((e) => {
-                if (e instanceof wjg.CellRangeEventArgs)
+                if (e instanceof wjg.CellRangeEventArgs) {
+                    this.writeRowLayout(e.panel.rows[e.row]);
+
                     this.raiseOnContentHeightChanged(new RowColEventArgs(e.panel, e.row, -1));
+                }
             });
 
-        this.selectionChangingNg.subscribe(e => {
+        /* this.selectionChangingNg.subscribe(e => {
             if (e instanceof wjg.CellRangeEventArgs) {
                 if (!e.range.isSingleCell && this.selectionMode != wjg.SelectionMode.CellRange)
                     this.selectionMode = wjg.SelectionMode.CellRange;
                 else if (e.range.isSingleCell && this.selectionMode == wjg.SelectionMode.CellRange)
                     this.selectionMode = wjg.SelectionMode.Row;
             }
-        })
+        }) */
 
         this.initDefaultStyle();
 
@@ -1128,6 +1269,16 @@ export class BravoWebGrid extends WjFlexGrid implements IBravoControlBase {
 
         let _nLevel = _parentRow.level;
         return 8 * (_nLevel + 1);
+    }
+
+    private writeRowLayout(row: wjg.Row) {
+        if (row == null) return;
+
+        let _it = this.rowLayout.find(it => it.index == row.index);
+        if (_it)
+            _it.renderSize = row.renderSize;
+        else
+            this.rowLayout.push({ index: row.index, renderSize: row.renderSize });
     }
 
     ngOnDestroy(): void {
@@ -1424,10 +1575,16 @@ export class BravoWebGrid extends WjFlexGrid implements IBravoControlBase {
             }
         }
 
+        let _col = <wjg.Column>panel.columns[col];
+
         if (_cellElement && _cellElement.querySelectorAll('br').length > 0)
             pCellInfo.zText = panel.getCellData(row, col, true);
+        else if (_col != null && _col.dataType == wjc.DataType.Number)
+            pCellInfo.zText = panel.getCellData(row, col, false);
         else if (_cellElement && _cellElement.textContent)
             pCellInfo.zText = _cellElement.textContent.trim();
+
+        console.log(pCellInfo.zText, _cellElement.textContent);
     }
 
     public getCellRectDisplay(panel: wjg.GridPanel, row: number, col: number, raw?: boolean) {
@@ -1505,7 +1662,7 @@ export class BravoWebGrid extends WjFlexGrid implements IBravoControlBase {
     }
 
     protected initDefaultStyle(pbManualInitClass: boolean = true) {
-        let _cs = CellStyle.parseString('TextAlign:CenterCenter;Font:,,style=Bold;Border:Flat,,#aaa,;BackColor:Ivory;WordWrap:True;ForeColor:#000000;');
+        let _cs = CellStyle.parseString('TextAlign:CenterCenter;Font:,,style=Regular;Border:Flat,,#aaa,;WordWrap:True;ForeColor:#000000;');
         if (!this.styles.containsKey(CellStyleEnum.Fixed))
             this.styles.add(CellStyleEnum.Fixed, _cs);
         else
@@ -1678,7 +1835,21 @@ export class BravoWebGrid extends WjFlexGrid implements IBravoControlBase {
         if (String.isNullOrEmpty(_zGrdTxt))
             BravoResourceManager.getString('GrandTotalItemText').subscribe(text => _zGrdTxt = text);
 
-        this.cells.setCellData(_nRow, this.nTreeColumnPos, _zGrdTxt);
+        let _col = this.columns[this.nTreeColumnPos];
+        let _lastDataType: wjc.DataType;
+        if (_col instanceof wjg.Column && _col.dataType != wjc.DataType.String) {
+            _lastDataType = _col.dataType;
+            _col.dataType = wjc.DataType.String;
+        }
+
+        try {
+            this.cells.setCellData(_nRow, this.nTreeColumnPos, _zGrdTxt);
+        }
+        finally {
+            if (_col instanceof wjg.Column && _lastDataType != null) {
+                _col.dataType = _lastDataType;
+            }
+        }
 
         let _lstSum = this.createOrderedSumCols();
         for (const _col of _lstSum) {
@@ -1696,6 +1867,7 @@ export class BravoWebGrid extends WjFlexGrid implements IBravoControlBase {
 
             if (this.sumColumns.containsKey(BravoWebGrid.AllColumnValue) ||
                 this.sumColumns.containsKey(this.columns[_nCol].name)) {
+
                 this.columns[_nCol].aggregate = wjc.Aggregate.Sum;
                 _colsSum.push(_nCol);
             }
@@ -1879,13 +2051,6 @@ export class BravoWebGrid extends WjFlexGrid implements IBravoControlBase {
         // if (!_bHasSorted) return;
     }
 
-    onBeforeUpdateGroups = new wjc.Event();
-    onAfterUpdateGroups = new wjc.Event();
-
-    public raiseOnAfterUpdateGroups() {
-        this.onAfterUpdateGroups.raise(true);
-    }
-
     public updateGroup(pbIsSorted: boolean = false, pbRestoreLastNodeState: boolean = true): void {
         if (this.columns.length <= 0 || this.rows.length <= 0)
             return;
@@ -2016,22 +2181,8 @@ export class BravoWebGrid extends WjFlexGrid implements IBravoControlBase {
 
                 try {
                     for (let _n = 0; _n < this.groups.count; _n++) {
-                        let _group = this.groups.get(_n),
-                            _groupVal = <GroupColumnItem>_group.value;
-
+                        let _group = this.groups.get(_n);
                         let _groupDesc = new wjc.PropertyGroupDescription(_group.key);
-
-                        let _zColCaption = String.empty;
-                        if (_groupVal && _groupVal.text)
-                            _zColCaption = _groupVal.text;
-
-                        if (!_zColCaption)
-                            _zColCaption = '{value}';
-
-                        if (!_zColCaption.includes('{') && !_zColCaption.includes('}'))
-                            _zColCaption += '{value}';
-
-                        this.groupHeaderFormat = _zColCaption;
 
                         _cv.groupDescriptions.push(_groupDesc);
                     }
@@ -2043,15 +2194,68 @@ export class BravoWebGrid extends WjFlexGrid implements IBravoControlBase {
 
             if (!this.bManualSumForGroup) this.updateSumCols();
             if (this.bAllowGrandTotal) this.updateGrandTotalRow();
-            
         }
         finally {
             if (!_bLastUpdate) this.endUpdate();
-            this._bUpdated = true;
+
             this._bUpdateGroupFlag = false;
+
             this.raiseOnContentHeightChanged();
-            this.raiseOnAfterUpdateGroups();
+
+            if (this.bAllowRaisingUpdateGroupsEvents) {
+                this.onAfterUpdateGroups.raise(this, wjc.EventArgs.empty);
+            }
         }
+    }
+
+    public static getGroupHeader(pGroup: wjg.GroupRow): string {
+        let grid = <BravoWebGrid>pGroup.grid,
+            fmt = grid.groupHeaderFormat || wjc.culture.FlexGrid.groupHeaderFormat,
+            group = wjc.tryCast(pGroup.dataItem, wjc.CollectionViewGroup) as wjc.CollectionViewGroup;
+
+        if (group && fmt) {
+
+            // get group info
+            let propName = group.groupDescription['propertyName'],
+                value = group.name,
+                col = grid.getColumn(propName);
+
+            let _grp = grid.groups.getValue(propName);
+            if (_grp) {
+                if (String.isNullOrEmpty(_grp.text))
+                    fmt = "{value}";
+                else
+                    fmt = _grp.text + "{value}"
+            }
+
+            // customize with column info if possible
+            let isHtml = pGroup.isContentHtml; // TFS 114902
+            if (col) {
+                isHtml = isHtml || col.isContentHtml;
+                if (col.header) {
+                    propName = col.header;
+                }
+                if (col.dataMap) {
+                    value = col.dataMap.getDisplayValue(value);
+                } else if (col.format) {
+                    value = wjc.Globalize.format(value, col.format);
+                }
+            }
+
+            // get count including all items (including items not on the current page,
+            // as calculated when setting Column.Aggregate TFS 195467)
+            let count = group.getAggregate(wjc.Aggregate.CntAll, null, grid.collectionView);
+            //let count = group.items.length;
+
+            // build header text
+            return wjc.format(fmt, {
+                name: wjc.escapeHtml(propName),
+                value: isHtml ? value : wjc.escapeHtml(value),
+                level: group.level,
+                count: count
+            });
+        }
+        return '';
     }
 
     private sort() {
@@ -2184,7 +2388,7 @@ export class BravoWebGrid extends WjFlexGrid implements IBravoControlBase {
             max = null,
             bnd = binding ? new wjc.Binding(binding) : null;
 
-        for (var i = topRow + 1; i <= bottomRow; i++) {
+        for (var i = topRow; i <= bottomRow; i++) {
             var _row = this.rows[i];
             if (_row instanceof wjg.GroupRow || _row.height == 0) {
                 continue;
@@ -2362,7 +2566,7 @@ export class BravoWebGrid extends WjFlexGrid implements IBravoControlBase {
     }
 
     public isSumCol(pnCol: number) {
-        if (!this.columns[pnCol].visible || !this.isNumericCol(pnCol))
+        if ((this.columns[pnCol] && !this.columns[pnCol].visible) || !this.isNumericCol(pnCol))
             return false;
 
         if (this.sumColumns.containsKey(BravoWebGrid.AllColumnValue))
@@ -2854,8 +3058,8 @@ export class BravoWebGrid extends WjFlexGrid implements IBravoControlBase {
     }
 
     protected handleRightMouseButtonUp(e: MouseEvent) {
-        let _bIsUpdating = this.isUpdating;
-        if (!_bIsUpdating) this.beginUpdate();
+        // let _bIsUpdating = this.isUpdating;
+        // if (!_bIsUpdating) this.beginUpdate();
 
         try {
             let _hit = this.hitTest(e);
@@ -2915,7 +3119,7 @@ export class BravoWebGrid extends WjFlexGrid implements IBravoControlBase {
             }
         }
         finally {
-            if (!_bIsUpdating) this.endUpdate();
+            // if (!_bIsUpdating) this.endUpdate();
         }
     }
 
@@ -3836,10 +4040,11 @@ export class BravoCellFactory extends wjg.CellFactory {
                         if (col == _nFirstVisible && col != _grd.nTreeColumnPos && _gr != null && _bIsTreeNodeCell)
                             cell.textContent = _cellData;
                         else if (col == _nFirstVisible && !_bIsTreeNodeCell)
-                            cell.textContent = _cellData
+                            cell.textContent = _cellData;
 
                         if (col == _grd.nTreeColumnPos && !_grd.bGroupInColumn) {
                             _nIndent = _grd.getCellIndent(row, col);
+                            _className += ' ' + _col.cssClass;
 
                             _cs = _grd.styles.getValue(CellStyleEnum.Normal);
                             let _css1 = CellStyle.buildCss(_cs, StyleElementFlags.Margins);
@@ -3857,7 +4062,7 @@ export class BravoCellFactory extends wjg.CellFactory {
                         }
 
                         if (_gr != null && col == _grd.nTreeColumnPos && !_grd.isTreeNodeMode() && !cell.classList.contains('bravo-grandtotal'))
-                            BravoCore.append(cell, this._getTreeIcon(_gr) + _gr.getGroupHeader());
+                            BravoCore.append(cell, this._getTreeIcon(_gr) + BravoWebGrid.getGroupHeader(_gr));
 
                         if (_bIsTreeNodeCell && !_grd.isHiddenRow(row) && _grd.isTreeNodeMode()) {
                             let _nChildCount = this.childCount(_gr);
@@ -3879,7 +4084,7 @@ export class BravoCellFactory extends wjg.CellFactory {
                         }
                     }
 
-                    if (_bIsGrandTotalCell && col == panel.columns.firstVisibleIndex)
+                    if (_bIsGrandTotalCell && col == panel.columns.firstVisibleIndex && col != _grd.nTreeColumnPos)
                         cell.textContent = null;
                 }
                 break;

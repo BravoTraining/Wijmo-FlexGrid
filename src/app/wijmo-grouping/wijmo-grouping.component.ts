@@ -93,7 +93,6 @@ export class WijmoGroupingComponent implements OnInit, AfterViewInit {
       // this.cv.groupDescriptions.push(new wjCore.PropertyGroupDescription(event.target.value));
   
         this.flex.groupBy(event.target.value);
-      
       return;
     }
     this.cv.groupDescriptions.forEach((item, idx) => {
@@ -120,6 +119,7 @@ export class WijmoGroupingComponent implements OnInit, AfterViewInit {
 
   flexInitialized(flex: BravoWebGrid) {
     flex.itemsSource = this.cv;
+    flex.bAllowRaisingUpdateGroupsEvents = true;
     
     this.brGroupPath = new BravoGrouppath(this.menuGroupPath, flex);
 
