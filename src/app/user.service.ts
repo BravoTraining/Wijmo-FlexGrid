@@ -81,6 +81,7 @@ export class UserService {
   private jsonUrl = '../assets/user-list.json';
   private jsonRoles = '../assets/roles.json';
   private jsonData = '../assets/data_nxt.json';
+  private _treeDataJson = '../assets/tree_data.json';
 
   getJsonData(): Observable<any> {
     return this.http.get(this.jsonUrl);
@@ -88,6 +89,10 @@ export class UserService {
 
   getRoles(): Observable<any[]> {
     return this.http.get<any[]>(this.jsonRoles).pipe(delay(1000));
+  }
+
+  getTreeData(): Observable<any[]> {
+    return this.http.get<any[]>(this._treeDataJson);
   }
 
   getData(): Observable<any[]> {

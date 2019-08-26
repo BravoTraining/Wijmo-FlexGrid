@@ -4,7 +4,6 @@ import { Event, AlignmentEnum } from '../lib/core/core';
 import { Observable, Subscription, timer, concat } from 'rxjs';
 import { DropDown, Spliter } from './dropdown';
 import { IBravoToolStrip } from '../lib/ui/interface/IBravoToolStrip';
-import { ToolStrip } from '../lib/ui/toolstrip/toolstrip';
 
 const AutoNumberingHotKeyFormat = "{0}.";
 const DelayTimeWhenSubDropDownOpen = 400;

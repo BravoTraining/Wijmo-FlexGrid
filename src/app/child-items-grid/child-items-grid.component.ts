@@ -86,7 +86,7 @@ const columnPos = 1;
   templateUrl: './child-items-grid.component.html',
   styleUrls: ['./child-items-grid.component.css'],
 })
-export class ChildItemsGridComponent implements OnInit, AfterViewInit {
+export class ChildItemsGridComponent implements OnInit {
   data: any[];
   parentItems: any[];
   treeData = [];
@@ -116,17 +116,17 @@ export class ChildItemsGridComponent implements OnInit, AfterViewInit {
 
 
     flexgrid.childItemsPath = "children";
-    // flexgrid.groupBy("ItemName");
+
     flexgrid.zTreeColName = "ItemName";
-    flexgrid.zMakingTreeNodeKeyColName = "ItemName";
+    flexgrid.zMakingTreeNodeKeyColName = "_GroupOrder";
     flexgrid.groupBy(flexgrid.zMakingTreeNodeKeyColName);
 
     this.brGroupPath = new BravoGrouppath(this.menu, flexgrid);
     this.menu.bMouseHoverDisable = true;
 
 
-
     this.loadedRows();
+  
     // this.mergeHeader(flexgrid);
     this.formatItem();
   }
@@ -252,11 +252,9 @@ export class ChildItemsGridComponent implements OnInit, AfterViewInit {
   }
 
   getInitData() {
-    this.userService.getData().subscribe(data => {
+    this.userService.getTreeData().subscribe(data => {
       this.data = data;
       this.collectionView = new wjcCore.CollectionView(this.data);
-      this.buildTreeFromCollection(this.collectionView);
-      
     })
   }
 
@@ -319,6 +317,10 @@ export class ChildItemsGridComponent implements OnInit, AfterViewInit {
       totalChild++;
       index--;
     }
+
+    collectionView.items.forEach((_item) => {
+      _item.children.sort((_item1, _item2) => this.sortByGroupOrder(_item1, _item2));
+    })
     collectionView.endUpdate();
   }
 
@@ -361,10 +363,4 @@ export class ChildItemsGridComponent implements OnInit, AfterViewInit {
     }
   }
 
-
-  // @ViewChild('dropdown', {static:false}) menu: wjcInput.Menu;
-
-  public ngAfterViewInit() {
-    // this.menu.itemsSource = ['New', 'Open', 'Save', 'Exit'];
-  }
 }

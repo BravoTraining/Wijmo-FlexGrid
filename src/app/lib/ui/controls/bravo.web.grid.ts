@@ -12,7 +12,7 @@ import { MessageResources } from "../resources/message.resources";
 import {
     CellStyleEnum, GridAutoTextContentEnum, GridDataCellEnum, GridAutoFitRowHeightEnum,
     RowHeaderNumberingEnum, ScrollBars, StyleElementFlags, BarCodeTypeEnum, GridCellTypeEnum, GridCountGroupChildEnum,
-     Border3DSide, GridBuiltInContextMenuEnum, SubtotalPositionEnum, RestrictedColumnEnum
+    Border3DSide, GridBuiltInContextMenuEnum, SubtotalPositionEnum, RestrictedColumnEnum
 } from "../enums";
 
 import { IBravoControlBase } from "../interface/IBravoControlBase";
@@ -31,7 +31,6 @@ import { Enum } from '../components/bravo.decorator';
 import { GridCellInfo } from '../dto/grid.cell.info';
 import { getCellType, pxToPt } from '../bravo.ui.extensions';
 import { BravoGraphicsRenderer } from '../bravo.graphics.renderer';
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
 const NoDisplayPermissionContent: string = "●●●";
 const COLUMN_NAME_PATTERN_FORMAT = "(?:\\b){0}(?:\\b)";
@@ -828,6 +827,8 @@ export class BravoWebGrid extends WjFlexGrid implements IBravoControlBase {
     public readonly onAfterUpdateGroups = new wjc.Event();
 
     public readonly onBeforeUpdateGroups = new wjc.Event();
+
+    public readonly onActiveItemChanged = new wjc.Event();
 
     public readonly evaluatingAutoTextCell = new Event();
     public onEvaluatingAutoTextCell(e?: wjg.FormatItemEventArgs) {
@@ -2208,6 +2209,22 @@ export class BravoWebGrid extends WjFlexGrid implements IBravoControlBase {
         }
     }
 
+    private raiseOnActiveItemChanged() {
+        this.onActiveItemChanged.raise(this, wjc.CancelEventArgs.empty)
+    }
+
+    public debounceTime(pFunc, pnDelay) {
+        let _timer = null;
+        return function () {
+            let _self = this,
+                _args = arguments;
+            clearTimeout(_timer);
+            _timer = setTimeout(function () {
+                pFunc.apply(_self, _args);
+            }, pnDelay);
+        }
+    }
+
     public static getGroupHeader(pGroup: wjg.GroupRow): string {
         let grid = <BravoWebGrid>pGroup.grid,
             fmt = grid.groupHeaderFormat || wjc.culture.FlexGrid.groupHeaderFormat,
@@ -2477,6 +2494,7 @@ export class BravoWebGrid extends WjFlexGrid implements IBravoControlBase {
                         _gr.isCollapsed = !_gr.isCollapsed;
                 }
         }
+
     }
 
     private _handleMouseDown(e) {
@@ -4206,18 +4224,18 @@ export class BravoCellFactory extends wjg.CellFactory {
                     if (this._barCodeCtrl == null)
                         // this._barCodeCtrl = new BravoBarCode();
 
-                    if (_cellType == GridCellTypeEnum.qrcode) {
-                        this._barCodeCtrl.barCodeType = BarCodeTypeEnum.QRCode;
-                    }
-                    else {
-                        let _zFormat = wjc.asString(cellStyle['Format']);
-                        if (!String.isNullOrEmpty(_zFormat) &&
-                            _zFormat.toLowerCase().startsWith(GridCellTypeEnum[GridCellTypeEnum.barcode] + '.')) {
-                            let _codeType = BarCodeTypeEnum[_zFormat.split('.')[1]];
-                            if (_codeType != null)
-                                this._barCodeCtrl.barCodeType = _codeType;
+                        if (_cellType == GridCellTypeEnum.qrcode) {
+                            this._barCodeCtrl.barCodeType = BarCodeTypeEnum.QRCode;
                         }
-                    }
+                        else {
+                            let _zFormat = wjc.asString(cellStyle['Format']);
+                            if (!String.isNullOrEmpty(_zFormat) &&
+                                _zFormat.toLowerCase().startsWith(GridCellTypeEnum[GridCellTypeEnum.barcode] + '.')) {
+                                let _codeType = BarCodeTypeEnum[_zFormat.split('.')[1]];
+                                if (_codeType != null)
+                                    this._barCodeCtrl.barCodeType = _codeType;
+                            }
+                        }
 
                     this._barCodeCtrl.codeValue = _zOrgText;
                     this._barCodeCtrl.autoScale = true;

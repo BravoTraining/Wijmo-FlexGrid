@@ -130,3 +130,9 @@
     border-radius: 0 !important;
 }
 
+.bravo-tooltip {
+    background-color: #f0f0f0;
+    border-radius:  0;
+    width: auto;
+    justify-content: center;
+}

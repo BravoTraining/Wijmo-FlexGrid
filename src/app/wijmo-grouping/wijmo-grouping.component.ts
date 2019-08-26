@@ -124,7 +124,7 @@ export class WijmoGroupingComponent implements OnInit, AfterViewInit {
     this.brGroupPath = new BravoGrouppath(this.menuGroupPath, flex);
 
     // flex.groupBy("ItemName");
-    // flex.groupBy("Unit");
+    flex.groupBy("Unit");
     // flex.groupBy("OpenInventory");
 
   }

@@ -5,6 +5,7 @@ import { MenuStrip } from '../controller/menustrip';
 import { ToolStrip } from '../lib/ui/toolstrip/toolstrip';
 import { ComboBox } from 'wijmo/wijmo.input';
 import { BravoWebGrid } from '../lib/ui/controls/bravo.web.grid';
+import { AlignmentEnum } from '../lib/core/core';
 
 export class BravoGrouppath extends ComboBox {
 
@@ -13,6 +14,7 @@ export class BravoGrouppath extends ComboBox {
     private _bIsAddItem = false;
     private _bLoadNewParentRow = true;
     private _flexGrid: BravoWebGrid;
+    private _toolTip = new wjCore.Tooltip();
 
     private _zGroupDes: string;
     private _bNewParent = true;
@@ -20,6 +22,7 @@ export class BravoGrouppath extends ComboBox {
     private _menuStrip: MenuStrip;
     private _nGroupItemCount: number = 0;
     private _bUpdateComplete: boolean = false;
+    private _handlerSelectionChanged: any;
 
     public get bTreeReport(): boolean {
         return this._flexGrid ? this._flexGrid.isTreeNodeMode() : false;
@@ -48,7 +51,8 @@ export class BravoGrouppath extends ComboBox {
             return;
 
         if (this._flexGrid) {
-            this._flexGrid.selectionChanged.removeHandler(this.grid_selectionChanged.bind(this));
+            this._handlerSelectionChanged = this._flexGrid.debounceTime(this.grid_selectionChanged, 150);
+            this._flexGrid.selectionChanged.removeHandler(this._handlerSelectionChanged.bind(this));
             this._flexGrid.onBeforeUpdateGroups.removeHandler(this.grid_beforeUpdate.bind(this));
             this._flexGrid.onAfterUpdateGroups.removeHandler(this.grid_updateComplete.bind(this));
         }
@@ -57,51 +61,52 @@ export class BravoGrouppath extends ComboBox {
             this._flexGrid = pGrid;
         }
         finally {
-            this._flexGrid.selectionChanged.addHandler(this.grid_selectionChanged.bind(this));
+            this._handlerSelectionChanged = this._flexGrid.debounceTime(this.grid_selectionChanged, 150);
+            this._flexGrid.selectionChanged.addHandler(this._handlerSelectionChanged.bind(this));
             this._flexGrid.onBeforeUpdateGroups.addHandler(this.grid_beforeUpdate.bind(this));
             this._flexGrid.onAfterUpdateGroups.addHandler(this.grid_updateComplete.bind(this));
+            this._flexGrid.loadedRows.addHandler(this.grid_collectionChanged.bind(this));
         }
     }
 
-    private grid_selectionChanged(_s, _e) {
-        let _row = this._flexGrid.selectedRows[0]
+    private grid_selectionChanged(s, e) {
+        this._nGroupItemCount = s.groups.count;
+        let _row = this._flexGrid.selectedRows[0];
         this.setComboBoxItems(_row);
     }
 
-    private grid_beforeUpdate(_s, _e) {
-        this._flexGrid.selectionChanged.removeAllHandlers()
+    private grid_collectionChanged(s, e) {
+        console.log("====")
+        this._setSelectedRowPos();
     }
 
-    private grid_updateComplete(_s, _e) {
-        this._flexGrid.selectionChanged.addHandler(this.grid_selectionChanged.bind(this));
+    private grid_beforeUpdate(s, e) {
+        this._flexGrid.selectionChanged.removeHandler(this._handlerSelectionChanged.bind(this));
+    }
+
+    private grid_updateComplete(s, e) {
+        this._flexGrid.selectionChanged.addHandler(this._handlerSelectionChanged.bind(this));
         if (this._nGroupItemCount == 0) {
             this._setSelectedRowPos();
-            this._nGroupItemCount = _s.groups.count;
             return;
         }
-
-        this._nGroupItemCount = _s.groups.count;
-
-        if (_s.selectedRows[0] == undefined) {
+        this._bUpdateComplete = true;
+        if (s.selectedRows[0] == undefined || s.groups.count == 0) {
             this._setSelectedRowPos();
         }
         else {
-            this.setComboBoxItems(_s.selectedRows[0])
-        }
-
-        if (_s.groups.count == 0) {
-            this._setSelectedRowPos();
+            this.setComboBoxItems(s.selectedRows[0])
         }
     }
 
-    public createNewGroupPath(pParentNodeOfRow: any, pRow) {
+    public createNewGroupPath(pParentNodeOfRow: any) {
         let _nLenParentNode = pParentNodeOfRow.length;
+        let _nCbItemIdx = this._getCbFirst();
 
         // check row parent
         if (this._bIsAddItem) {
             let _nItemIndex = "";
             let _nMenuStripLeng = this._menuStrip.itemsSource.length;
-            let _nCbItemIdx = this._getCbFirst();
 
             if (_nCbItemIdx !== null) {
                 if (this._menuStrip.itemsSource[_nMenuStripLeng - 2] instanceof ComboBox
@@ -124,7 +129,6 @@ export class BravoGrouppath extends ComboBox {
         }
 
         let _nSpliceStart = 1;
-        let _nCbItemIdx = this._getCbFirst();
 
         // remove all menustrip item if remove item first
         if (_nLenParentNode == 0 && !this.bTreeReport) {
@@ -159,10 +163,28 @@ export class BravoGrouppath extends ComboBox {
                 this._createItemMenuStrip();
             }
 
-            if (_nLenParentNode > 0 && pRow.grid
-                .rows[pParentNodeOfRow[_nLenParentNode - 1].index + 1]
-                .hasChildren) {
-                this._createItemMenuStrip();
+            let _nodeLast = pParentNodeOfRow[_nLenParentNode - 1];
+
+            if (_nLenParentNode > 0) {
+                if (this._flexGrid.rows[_nodeLast.index + 1].hasChildren) {
+                    this._createItemMenuStrip(true);
+                }
+                else {
+                    if (this.bTreeReport) {
+                        for (let _i = _nodeLast.index + 1; _i < this._flexGrid.rows.length; _i++) {
+                            if (this._flexGrid.rows[_i].level == _nodeLast.level 
+                                    && this._flexGrid.rows[_i].hasChildren) {
+                                break;
+                            }
+
+                            if (this._flexGrid.rows[_i].level > _nodeLast.level
+                                    && this._flexGrid.rows[_i].hasChildren) {
+                                this._createItemMenuStrip(true);
+                                break;
+                            }
+                        }
+                    }
+                }
             }
 
             this._bNewParent = true;
@@ -170,10 +192,23 @@ export class BravoGrouppath extends ComboBox {
         }
 
         // init dropdown item
+        
+        this._menuStrip.itemsSource.push(new ToolStrip("1", null, "abc"));
+        this._menuStrip.itemsSource.push(new ToolStrip("btnExpand", null, `<span class="fa fa-angle-double-right" aria-hidden="true"></span>`));
+        this._menuStrip.itemsSource.push(new ToolStrip("2", null, "def"));
+
+        this._menuStrip.setAlignment(this._menuStrip.itemsSource[0], AlignmentEnum.Right);
+        this._menuStrip.setAlignment(this._menuStrip.itemsSource[1], AlignmentEnum.Right);
+        this._menuStrip.setAlignment(this._menuStrip.itemsSource[2], AlignmentEnum.Right);
+
         this._createItemMenuStrip();
         if (!this.bTreeReport) {
             this._zGroupDes = pParentNodeOfRow[0].dataItem.groupDescription.propertyName;
         }
+    }
+
+    private _btnExpandMenuStrip() {
+        alert("Expand button click");
     }
 
     public setComboBoxItems(pRow) {
@@ -185,8 +220,10 @@ export class BravoGrouppath extends ComboBox {
 
         // first load
         if ((this._bLoadNewParentRow && _parentNodeOfRow.length > 0)
-            || (this._bLoadNewParentRow && this.bTreeReport)) {
-            this.createNewGroupPath(_parentNodeOfRow, pRow);
+            || (this._bLoadNewParentRow && this.bTreeReport)
+            || (this.bTreeReport && this.comboBoxList[0].itemsSource.length == 0)) {
+                console.log("====")
+            this.createNewGroupPath(_parentNodeOfRow);
             this.comboBoxList[0].itemsSource = this._getAllNodeLevelZero();
             this._bLoadNewParentRow = false;
             this._bIsAddItem = true;
@@ -199,24 +236,30 @@ export class BravoGrouppath extends ComboBox {
         }
 
         // reload after
-        this.createNewGroupPath(_parentNodeOfRow, pRow);
+        this.createNewGroupPath(_parentNodeOfRow);
 
         // add items to combobox
         if (this._bNewParent) {
             if (_parentNodeOfRow.length > 0 && !this.bTreeReport
                 && String.compare(this._zGroupDes, _parentNodeOfRow[0].dataItem.groupDescription.propertyName) != 0) {
                 this.comboBoxList[0].itemsSource = this._getAllNodeLevelZero();
+                this._bUpdateComplete = false;
             }
 
-            if (!this.bTreeReport && _parentNodeOfRow.length > 0) {
+            // load new item for combox first, reset index.
+            if (!this.bTreeReport && _parentNodeOfRow.length > 0
+                && this._nGroupItemCount > 0 && this._bUpdateComplete) {
                 this.comboBoxList[0].itemsSource = this._getAllNodeLevelZero();
+                this._bUpdateComplete = false;
             }
 
             for (let i = 0; i < _parentNodeOfRow.length; i++) {
                 if (this.comboBoxList[0].itemsSource !== undefined) {
                     _nIndex = _parentNodeOfRow[i].index + 1;
+
                     let _thisRow = pRow.grid.rows[_nIndex];
-                    let _nCurrentLevel = _thisRow.hasChildren ? _thisRow.level : null;
+
+                    let _nCurrentLevel = _thisRow.hasChildren || this.bTreeReport ? _thisRow.level : null
 
                     if (_nCurrentLevel === null) {
                         continue;
@@ -250,11 +293,11 @@ export class BravoGrouppath extends ComboBox {
         return null;
     }
 
-    private _setSelectedRowPos(_pnRowIdx?: number) {
-        if (_pnRowIdx !== undefined) {
-            this._flexGrid.selection = new wjGrid.CellRange(_pnRowIdx, this._flexGrid.nTreeColumnPos)
+    private _setSelectedRowPos(pnRowIdx?: number) {
+        if (pnRowIdx !== undefined) {
+            this._flexGrid.selection = new wjGrid.CellRange(pnRowIdx, this._flexGrid.nTreeColumnPos)
 
-            let _rowParent = this.getParentNode(this._flexGrid.rows[_pnRowIdx]);
+            let _rowParent = this.getParentNode(this._flexGrid.rows[pnRowIdx]);
             if (_rowParent !== null && _rowParent.isCollapsed) _rowParent.isCollapsed = false;
             this._bChangeFromCb = false;
             return;
@@ -268,7 +311,7 @@ export class BravoGrouppath extends ComboBox {
         }
     }
 
-    private _createItemMenuStrip() {
+    private _createItemMenuStrip(pbParentNodeLast?: boolean) {
         let _cbItem = new ComboBox(document.createElement('div'));
         _cbItem.isRequired = false;
         _cbItem.displayMemberPath = "name";
@@ -312,10 +355,15 @@ export class BravoGrouppath extends ComboBox {
 
         this.comboBoxList.push(_cbItem);
         this._menuStrip.itemsSource.push(_cbItem);
-        this._menuStrip.itemsSource.push(new ToolStrip("", null, ""));
+        if (!pbParentNodeLast) {
+            this._menuStrip.itemsSource.push(new ToolStrip("", null, ""));
+        }
     }
 
     private _setVisibleDisplay(pParentNodeOfRow) {
+        this._toolTip.dispose();
+        this._toolTip.cssClass = "bravo-tooltip";
+        this._toolTip.showDelay = 250;
         if (this.bTreeReport && pParentNodeOfRow.length == 0) {
 
             let _nCbItemIdx = this._getCbFirst();
@@ -326,38 +374,56 @@ export class BravoGrouppath extends ComboBox {
             return;
         }
 
-        let _nIndexParent = 0;
+        let _nIndexParent = 0, 
+            _nMenuStripWidth = 0;
+        let _maxWidthMenu = this._menuStrip.hostElement.offsetWidth;
+
+
         this._menuStrip.itemsSource.forEach((_item, _idx) => {
-            if (!this.bTreeReport) {
-                if (_item instanceof ComboBox && _nIndexParent < pParentNodeOfRow.length) {
-                    this._menuStrip.itemsSource[_idx + 1].text = pParentNodeOfRow[_nIndexParent].dataItem.name.toString();
+            if (_item instanceof ComboBox && _nIndexParent < pParentNodeOfRow.length) {
+                if (!this.bTreeReport) {
+                    this._menuStrip.itemsSource[_idx + 1].text = BravoWebGrid.getGroupHeader(pParentNodeOfRow[_nIndexParent]);
                 }
-            }
-            else {
-                if (_item instanceof ComboBox && _nIndexParent < pParentNodeOfRow.length) {
+                else {
                     this._menuStrip.itemsSource[_idx + 1].text = pParentNodeOfRow[_nIndexParent].dataItem[this._flexGrid.zTreeColName];
                 }
-            }
 
-            if (_item instanceof ComboBox && _nIndexParent < pParentNodeOfRow.length) {
+                let _itemElement = this._menuStrip.itemsSource[_idx + 1].hostElement;
+                this._toolTip.setTooltip(_itemElement, this._menuStrip.itemsSource[_idx + 1].text);
+
                 this._menuStrip.itemsSource[_idx + 1].name = pParentNodeOfRow[_nIndexParent].index.toString();
                 this._changeSelectionIndex(_idx, pParentNodeOfRow[_nIndexParent].index);
                 _nIndexParent++;
             }
+
+            
+
+            setTimeout(function () {
+                _nMenuStripWidth += _item.hostElement.offsetWidth;
+                if (_nMenuStripWidth - 200 > _maxWidthMenu) {
+                    this._menuStrip.itemsSource[1].hostElement.setAttribute("hidden", "true");
+                }
+            }, 100);
+            
         })
+
+        // console.log(this._menuStrip.hostElement.getBoundingClientRect().width);
+        // console.log(this._menuStrip.divLeft)
+        // console.log(this._menuStrip.divRight.getBoundingClientRect().width)
+
     }
 
-    private _changeSelectionIndex(_pnIndex: number, _pnItemIdx: number) {
+    private _changeSelectionIndex(pnIndex: number, pnItemIdx: number) {
         let _nIdx = -1;
-        let _items = this._menuStrip.itemsSource[_pnIndex].itemsSource.items;
+        let _items = this._menuStrip.itemsSource[pnIndex].itemsSource.items;
         for (let _i = 0; _i < _items.length; _i++) {
-            if (_items[_i].index == _pnItemIdx) {
+            if (_items[_i].index == pnItemIdx) {
                 _nIdx = _i;
                 break;
             }
         }
 
-        this._menuStrip.itemsSource[_pnIndex].selectedIndex = _nIdx;
+        this._menuStrip.itemsSource[pnIndex].selectedIndex = _nIdx;
         this._bChangeFromCb = false;
     }
 
@@ -387,7 +453,7 @@ export class BravoGrouppath extends ComboBox {
                 i += _thisRow.dataItem.items.length;
                 _item.push(new Object({
                     index: _thisRow.index,
-                    name: _thisRow.dataItem.name
+                    name: BravoWebGrid.getGroupHeader(_thisRow)
                 }));
             }
         }
@@ -400,22 +466,26 @@ export class BravoGrouppath extends ComboBox {
         // flex grid tree
         if (this.bTreeReport) {
             this._flexGrid.rows.forEach((_item) => {
-                console.log(_item instanceof wjGrid.GroupRow)
                 if (_item.hasChildren && _item.level === 0) {
-                    _parentNode.push(new Object({ index: _item.index, name: _item.dataItem[this._flexGrid.zTreeColName] }));
+                    _parentNode.push(new Object({
+                        index: _item.index,
+                        name: _item.dataItem[this._flexGrid.zTreeColName]
+                    }));
                 }
             })
             return new wjCore.CollectionView(_parentNode, { currentItem: null });
         }
 
         // flex grid groupdescription
-        let _nIdxGroupItem = 0;
         for (let _i = 0; _i < this._flexGrid.rows.length; _i++) {
             let _item = this._flexGrid.rows[_i];
             if (_item instanceof wjGrid.GroupRow && _item.level === 0) {
-                _parentNode.push(new Object({ index: _item.index, name: _item.getGroupHeader() }));
-                _i += this._flexGrid.collectionView.groups[_nIdxGroupItem].items.length;
-                _nIdxGroupItem++;
+                _parentNode.push(new Object({
+                    index: _item.index,
+                    name: BravoWebGrid.getGroupHeader(_item)
+                }));
+
+                _i += _item.dataItem.items.length;
             }
         }
         return new wjCore.CollectionView(_parentNode, { currentItem: null });
