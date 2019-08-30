@@ -6,6 +6,8 @@ import { ToolStrip } from '../lib/ui/toolstrip/toolstrip';
 import { ComboBox } from 'wijmo/wijmo.input';
 import { BravoWebGrid } from '../lib/ui/controls/bravo.web.grid';
 import { AlignmentEnum } from '../lib/core/core';
+import { HostListener } from '@angular/core';
+import { BravoGroupPathComponent } from '../bravo-group-path/bravo-group-path.component';
 
 export class BravoGrouppath extends ComboBox {
 
@@ -23,6 +25,7 @@ export class BravoGrouppath extends ComboBox {
     private _nGroupItemCount: number = 0;
     private _bUpdateComplete: boolean = false;
     private _handlerSelectionChanged: any;
+    private _subMenuStrip: MenuStrip;
 
     public get bTreeReport(): boolean {
         return this._flexGrid ? this._flexGrid.isTreeNodeMode() : false;
@@ -65,7 +68,22 @@ export class BravoGrouppath extends ComboBox {
             this._flexGrid.selectionChanged.addHandler(this._handlerSelectionChanged.bind(this));
             this._flexGrid.onBeforeUpdateGroups.addHandler(this.grid_beforeUpdate.bind(this));
             this._flexGrid.onAfterUpdateGroups.addHandler(this.grid_updateComplete.bind(this));
-            this._flexGrid.loadedRows.addHandler(this.grid_collectionChanged.bind(this));
+
+
+            this._menuStrip.itemsSource.push(new ToolStrip("1", null, `<img src="http://bravo8.bravo.com.vn/assets/img/DockRight.png" alt="" style="width: 16px;">`));
+            this._menuStrip.itemsSource.push(new ToolStrip("btnExpand", null, `<span class="fa fa-angle-double-right" aria-hidden="true"></span>`));
+
+            // this._menuStrip.itemsSource.push(this._dropdown)
+            this._menuStrip.itemsSource.push(new ToolStrip("2", null, `<img src="http://bravo8.bravo.com.vn/assets/img/DockBottom.png" alt="" style="width: 16px;">`));
+
+            this._menuStrip.setAlignment(this._menuStrip.itemsSource[0], AlignmentEnum.Right);
+            this._menuStrip.setAlignment(this._menuStrip.itemsSource[1], AlignmentEnum.Right);
+            this._menuStrip.setAlignment(this._menuStrip.itemsSource[2], AlignmentEnum.Right);
+            // this._menuStrip.itemsSource[1].hostElement.setAttribute('style', 'display: none');
+            // this._menuStrip.selectedIndexChanged.addHandler(this.grid_collectionChanged.bind(this));
+
+            // this._menuStrip.itemsSource[1].menuItemSelected.addHandler(this.grid_showSubMenuStrip.bind(this))
+            // new ResizeSensor([this._menuStrip.hostElement, this._menuStrip.hostElement.parentElement], () => this.grid_showSubMenuStrip())
         }
     }
 
@@ -73,11 +91,6 @@ export class BravoGrouppath extends ComboBox {
         this._nGroupItemCount = s.groups.count;
         let _row = this._flexGrid.selectedRows[0];
         this.setComboBoxItems(_row);
-    }
-
-    private grid_collectionChanged(s, e) {
-        console.log("====")
-        this._setSelectedRowPos();
     }
 
     private grid_beforeUpdate(s, e) {
@@ -95,7 +108,7 @@ export class BravoGrouppath extends ComboBox {
             this._setSelectedRowPos();
         }
         else {
-            this.setComboBoxItems(s.selectedRows[0])
+            this.setComboBoxItems(s.selectedRows[0]);
         }
     }
 
@@ -172,13 +185,13 @@ export class BravoGrouppath extends ComboBox {
                 else {
                     if (this.bTreeReport) {
                         for (let _i = _nodeLast.index + 1; _i < this._flexGrid.rows.length; _i++) {
-                            if (this._flexGrid.rows[_i].level == _nodeLast.level 
-                                    && this._flexGrid.rows[_i].hasChildren) {
+                            if (this._flexGrid.rows[_i].level == _nodeLast.level
+                                && this._flexGrid.rows[_i].hasChildren) {
                                 break;
                             }
 
                             if (this._flexGrid.rows[_i].level > _nodeLast.level
-                                    && this._flexGrid.rows[_i].hasChildren) {
+                                && this._flexGrid.rows[_i].hasChildren) {
                                 this._createItemMenuStrip(true);
                                 break;
                             }
@@ -192,23 +205,10 @@ export class BravoGrouppath extends ComboBox {
         }
 
         // init dropdown item
-        
-        this._menuStrip.itemsSource.push(new ToolStrip("1", null, "abc"));
-        this._menuStrip.itemsSource.push(new ToolStrip("btnExpand", null, `<span class="fa fa-angle-double-right" aria-hidden="true"></span>`));
-        this._menuStrip.itemsSource.push(new ToolStrip("2", null, "def"));
-
-        this._menuStrip.setAlignment(this._menuStrip.itemsSource[0], AlignmentEnum.Right);
-        this._menuStrip.setAlignment(this._menuStrip.itemsSource[1], AlignmentEnum.Right);
-        this._menuStrip.setAlignment(this._menuStrip.itemsSource[2], AlignmentEnum.Right);
-
         this._createItemMenuStrip();
         if (!this.bTreeReport) {
             this._zGroupDes = pParentNodeOfRow[0].dataItem.groupDescription.propertyName;
         }
-    }
-
-    private _btnExpandMenuStrip() {
-        alert("Expand button click");
     }
 
     public setComboBoxItems(pRow) {
@@ -218,11 +218,24 @@ export class BravoGrouppath extends ComboBox {
         this._getParentNodeOfRow(pRow, _parentNodeOfRow);
         _parentNodeOfRow.reverse();
 
+        if (this.bTreeReport && this._getAllNodeLevelZero().itemCount == 0) {
+            if (this.comboBoxList.length > 0) {
+                this.comboBoxList.splice(0, this.comboBoxList.length);
+                let _nCbItemIdx = this._getCbFirst();
+                while (this._menuStrip.itemsSource.length > (_nCbItemIdx)) {
+                    this._menuStrip.itemsSource[this._menuStrip.itemsSource.length - 1].hostElement.remove();
+                    this._menuStrip.itemsSource.pop();
+                }
+            }
+
+            this._bIsAddItem = false;
+            return;
+        }
+
         // first load
         if ((this._bLoadNewParentRow && _parentNodeOfRow.length > 0)
             || (this._bLoadNewParentRow && this.bTreeReport)
-            || (this.bTreeReport && this.comboBoxList[0].itemsSource.length == 0)) {
-                console.log("====")
+            || (this.bTreeReport && this.comboBoxList.length == 0)) {
             this.createNewGroupPath(_parentNodeOfRow);
             this.comboBoxList[0].itemsSource = this._getAllNodeLevelZero();
             this._bLoadNewParentRow = false;
@@ -364,8 +377,8 @@ export class BravoGrouppath extends ComboBox {
         this._toolTip.dispose();
         this._toolTip.cssClass = "bravo-tooltip";
         this._toolTip.showDelay = 250;
-        if (this.bTreeReport && pParentNodeOfRow.length == 0) {
 
+        if (this.bTreeReport && pParentNodeOfRow.length == 0) {
             let _nCbItemIdx = this._getCbFirst();
 
             this._menuStrip.itemsSource[_nCbItemIdx + 1].text = "";
@@ -374,43 +387,57 @@ export class BravoGrouppath extends ComboBox {
             return;
         }
 
-        let _nIndexParent = 0, 
-            _nMenuStripWidth = 0;
-        let _maxWidthMenu = this._menuStrip.hostElement.offsetWidth;
+        let _nIndexParent = 0;
 
+        this._menuStrip.itemsSource.beginUpdate();
+        try {
+            this._menuStrip.itemsSource.forEach((_item, _idx) => {
+                if (_item instanceof ComboBox && _nIndexParent < pParentNodeOfRow.length) {
+                    if (!this.bTreeReport) {
+                        this._menuStrip.itemsSource[_idx + 1].text = BravoWebGrid.getGroupHeader(pParentNodeOfRow[_nIndexParent]);
+                    }
+                    else {
+                        this._menuStrip.itemsSource[_idx + 1].text = pParentNodeOfRow[_nIndexParent].dataItem[this._flexGrid.zTreeColName];
+                    }
 
-        this._menuStrip.itemsSource.forEach((_item, _idx) => {
-            if (_item instanceof ComboBox && _nIndexParent < pParentNodeOfRow.length) {
-                if (!this.bTreeReport) {
-                    this._menuStrip.itemsSource[_idx + 1].text = BravoWebGrid.getGroupHeader(pParentNodeOfRow[_nIndexParent]);
+                    let _itemElement = this._menuStrip.itemsSource[_idx + 1].hostElement;
+                    this._toolTip.setTooltip(_itemElement, this._menuStrip.itemsSource[_idx + 1].text);
+
+                    this._menuStrip.itemsSource[_idx + 1].name = pParentNodeOfRow[_nIndexParent].index.toString();
+                    this._changeSelectionIndex(_idx, pParentNodeOfRow[_nIndexParent].index);
+                    _nIndexParent++;
                 }
-                else {
-                    this._menuStrip.itemsSource[_idx + 1].text = pParentNodeOfRow[_nIndexParent].dataItem[this._flexGrid.zTreeColName];
-                }
+            })
+        }
+        finally {
+            this._menuStrip.itemsSource.endUpdate();
+            this._createSubMenuStrip();
+            this._addItemSubMenuStrip();
+        }
+    }
 
-                let _itemElement = this._menuStrip.itemsSource[_idx + 1].hostElement;
-                this._toolTip.setTooltip(_itemElement, this._menuStrip.itemsSource[_idx + 1].text);
+    private _addItemSubMenuStrip() {
+        if (this._checkWidthMenuStrip()) {
+            this._subMenuStrip.itemsSource.push(this._menuStrip.itemsSource.pop());
+            this._addItemSubMenuStrip()
+        }
+        return;
+ 
+    }
 
-                this._menuStrip.itemsSource[_idx + 1].name = pParentNodeOfRow[_nIndexParent].index.toString();
-                this._changeSelectionIndex(_idx, pParentNodeOfRow[_nIndexParent].index);
-                _nIndexParent++;
-            }
+    private _createSubMenuStrip() {
+        let _nodeChild = document.createElement('bravo-group-path');
+        this._flexGrid.hostElement.appendChild(_nodeChild);
+        wjCore.setCss(_nodeChild, {display: 'block', height: 'auto', width: '200px'})
+        this._subMenuStrip = new MenuStrip(_nodeChild);
+    }
 
-            
+    private _checkWidthMenuStrip() {
+        let _nHostWidth = this._menuStrip.hostElement.parentElement.offsetWidth;
+        let _nCurrentWidth = this._menuStrip.hostElement.getBoundingClientRect().width;
 
-            setTimeout(function () {
-                _nMenuStripWidth += _item.hostElement.offsetWidth;
-                if (_nMenuStripWidth - 200 > _maxWidthMenu) {
-                    this._menuStrip.itemsSource[1].hostElement.setAttribute("hidden", "true");
-                }
-            }, 100);
-            
-        })
-
-        // console.log(this._menuStrip.hostElement.getBoundingClientRect().width);
-        // console.log(this._menuStrip.divLeft)
-        // console.log(this._menuStrip.divRight.getBoundingClientRect().width)
-
+        if (_nCurrentWidth > _nHostWidth) return true;
+        return false;
     }
 
     private _changeSelectionIndex(pnIndex: number, pnItemIdx: number) {

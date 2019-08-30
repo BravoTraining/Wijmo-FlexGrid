@@ -26,10 +26,14 @@ import { ChildItemsGridComponent } from './child-items-grid/child-items-grid.com
 import { SafehtmlPipe } from './PipeCustomer/safehtml.pipe';
 import { WijmoGroupingComponent } from './wijmo-grouping/wijmo-grouping.component';
 
-import { BravoGroupPathComponent } from './bravo-group-path/bravo-group-path.component'
-import { BravoWebGrid } from './lib/ui/controls/bravo.web.grid'
+import { BravoGroupPathComponent } from './bravo-group-path/bravo-group-path.component';
+import { BravoWebGrid } from './lib/ui/controls/bravo.web.grid';
 
-
+import { BravoSplitComponent } from './controller/BravoComponent/bravo-split.component'; 
+import { BravoAreaDirective } from './controller/bravo-area.directive';
+import { SplitComponent } from './lib/component/split.component';
+import { SplitAreaDirective } from './lib/directive/splitArea.directive';
+import { AppResizeComponent } from './app-resize/app-resize.component';
 
 @NgModule({
   declarations: [
@@ -45,7 +49,12 @@ import { BravoWebGrid } from './lib/ui/controls/bravo.web.grid'
     SafehtmlPipe,
     WijmoGroupingComponent,
     BravoGroupPathComponent,
-    BravoWebGrid
+    BravoWebGrid,
+    BravoSplitComponent,
+    BravoAreaDirective,
+    SplitAreaDirective,
+    SplitComponent,
+    AppResizeComponent
   ],
   imports: [
     BrowserModule,

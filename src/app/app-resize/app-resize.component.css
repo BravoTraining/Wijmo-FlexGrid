@@ -1,0 +1,25 @@
+
+.textarea-class textarea {
+    min-width: 200px;
+    min-height: 200px;
+  }
+  
+  .textarea-class[min-width~="400px"] textarea {
+    background-color: transparent
+  }
+  .textarea-class[min-width~="600px"] textarea {
+    background-color: green;
+  }
+  
+  .textarea-class[min-width~="800px"] textarea {
+    background-color: orange;
+  }
+  
+  .textarea-class[min-width~="1000px"] textarea {
+    background-color: red;
+  }
+  
+  .empty-space {
+    height: 50px;
+  }
+  

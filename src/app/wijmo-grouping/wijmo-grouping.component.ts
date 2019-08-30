@@ -120,11 +120,10 @@ export class WijmoGroupingComponent implements OnInit, AfterViewInit {
   flexInitialized(flex: BravoWebGrid) {
     flex.itemsSource = this.cv;
     flex.bAllowRaisingUpdateGroupsEvents = true;
-    
+    flex.groupBy("Unit");
     this.brGroupPath = new BravoGrouppath(this.menuGroupPath, flex);
 
     // flex.groupBy("ItemName");
-    flex.groupBy("Unit");
     // flex.groupBy("OpenInventory");
 
   }

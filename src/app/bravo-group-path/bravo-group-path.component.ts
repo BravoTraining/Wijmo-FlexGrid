@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild, HostListener } from '@angular/core';
 
 import * as WjCore from 'wijmo/wijmo';
 
@@ -21,5 +21,4 @@ export class BravoGroupPathComponent extends MenuStrip implements OnInit{
   ngOnInit() {
 
   }
-
 }

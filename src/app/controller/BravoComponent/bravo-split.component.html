@@ -1,0 +1,35 @@
+<ng-content></ng-content>
+<ng-template ngFor [ngForOf]="displayedAreas" let-index="index" let-last="last">
+  <div
+    #gutterEls
+    *ngIf="last === false"
+    class="as-split-gutter"
+    [style.flex-basis.px]="gutterSize"
+    [style.order]="index * 2 + 1"
+    [style.backgroundColor]="_color"
+    (mousedown)="startDragging($event, index * 2 + 1, index + 1)"
+    (touchstart)="startDragging($event, index * 2 + 1, index + 1)"
+  >
+    <div class="as-split-gutter-icon"></div>
+  </div>
+
+  <div
+    *ngIf="last === true && _direction === 'horizontal'"
+    class="as-split-gutter-horizontal"
+    (mouseup)="clickGutter($event, index + 1)"
+    (touchend)="clickGutter($event, index + 1)"
+    [hidden]="_bIsHidden"
+    [style.left.px]="_nGutterPos"
+    [style.width.px]="gutterSize"
+  ></div>
+
+  <div
+    *ngIf="last === true && _direction === 'vertical'"
+    class="as-split-gutter-vertical"
+    (mouseup)="clickGutter($event, index + 1)"
+    (touchend)="clickGutter($event, index + 1)"
+    [hidden]="_bIsHidden"
+    [style.top.px]="_nGutterPos"
+    [style.height.px]="gutterSize"
+  ></div>
+</ng-template>

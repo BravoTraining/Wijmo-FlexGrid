@@ -8,6 +8,10 @@ import { isNullOrUndefined } from 'util';
 import { BravoGroupPathComponent } from '../bravo-group-path/bravo-group-path.component';
 import { BravoGrouppath } from '../BravoClass/bravo.grouppath';
 import { BravoWebGrid } from '../lib/ui/controls/bravo.web.grid';
+import { MenuStrip } from '../controller/menustrip';
+
+import { ResizeSensor } from 'css-element-queries/src/ResizeSensor';
+
 
 class CustomMergeManager extends wjcGrid.MergeManager {
   constructor(flexGrid: wjcGrid.FlexGrid) {
@@ -97,38 +101,86 @@ export class ChildItemsGridComponent implements OnInit {
   isHidden = false;
   brGroupPath: BravoGrouppath;
 
-  collectionView: wjcCore.CollectionView;
+  collectionView = new wjcCore.CollectionView();
 
   constructor(private userService: UserService) {
   }
 
+  @ViewChild('childItem', { static: false }) flex: BravoWebGrid;
+  @ViewChild('menuGroupPath', { static: false }) menu: BravoGroupPathComponent;
+
   ngOnInit() {
     this.getInitData();
-    
+
   }
 
-
-  @ViewChild('childItem', {static: false}) flex: BravoWebGrid;
-  @ViewChild('menuGroupPath', {static: false}) menu: BravoGroupPathComponent;
 
   flexInitialized(flexgrid: BravoWebGrid) {
     // flexgrid.mergeManager = new CustomMergeManager(flexgrid);
 
-
     flexgrid.childItemsPath = "children";
 
+    flexgrid.bAllowRaisingUpdateGroupsEvents = true;
     flexgrid.zTreeColName = "ItemName";
     flexgrid.zMakingTreeNodeKeyColName = "_GroupOrder";
     flexgrid.groupBy(flexgrid.zMakingTreeNodeKeyColName);
+    
 
     this.brGroupPath = new BravoGrouppath(this.menu, flexgrid);
     this.menu.bMouseHoverDisable = true;
 
 
     this.loadedRows();
-  
+
     // this.mergeHeader(flexgrid);
     this.formatItem();
+  }
+
+  treeView() {
+    this.flex.beginUpdate();
+
+    try {
+      this.buildTreeFromCollection(this.flex.collectionView);
+    }
+    finally {
+      this.flex.endUpdate();
+      this.flex.zTreeColName = "ItemName";
+      this.flex.zMakingTreeNodeKeyColName = "_GroupOrder";
+      this.flex.groupBy(this.flex.zMakingTreeNodeKeyColName);
+    }
+
+    this.isHidden = !this.isHidden;
+
+    // this.flex.rows.forEach((row) => {
+    //   if (row.hasChildren) {
+    //     console.log(row);
+    //   }
+
+
+    // })
+  }
+
+  gridView() {
+    this.flex.beginUpdate();
+    try {
+      this.unBuildTreeFromCollection(this.flex.collectionView);
+    }
+    finally {
+      this.flex.endUpdate();
+      this.flex.clearGroups();
+    }
+
+    // this.flex.clearGroups();
+    this.isHidden = !this.isHidden;
+
+  }
+
+  getInitData() {
+    this.userService.getTreeData().subscribe(data => {
+      this.data = data;
+      this.collectionView = new wjcCore.CollectionView(this.data);
+      this.buildTreeFromCollection(this.collectionView);
+    })
   }
 
   mergeHeader(flexGrid: wjcGrid.FlexGrid) {
@@ -195,8 +247,8 @@ export class ChildItemsGridComponent implements OnInit {
     }
 
     if (s.cells == e.panel) {
-      
-      
+
+
 
       if (e.panel.rows[e.row].hasChildren) {
         e.panel.rows[e.row].cssClass = 'boldRow';
@@ -233,30 +285,7 @@ export class ChildItemsGridComponent implements OnInit {
     }
   }
 
-  treeView() {
-    this.buildTreeFromCollection(this.collectionView);
-    this.isHidden = !this.isHidden;
-    // this.flex.rows.forEach((row) => {
-    //   if (row.hasChildren) {
-    //     console.log(row);
-    //   }
-      
-      
-    // })
-  }
 
-  gridView() {
-    this.unBuildTreeFromCollection(this.collectionView);
-    this.isHidden = !this.isHidden;
-
-  }
-
-  getInitData() {
-    this.userService.getTreeData().subscribe(data => {
-      this.data = data;
-      this.collectionView = new wjcCore.CollectionView(this.data);
-    })
-  }
 
   convertArrayToTreeData(array) {
     let treeData = [];
@@ -292,7 +321,7 @@ export class ChildItemsGridComponent implements OnInit {
     collectionView.items.sort((obj1, obj2) => this.sortByGroupOrder(obj1, obj2));
 
     for (let idx = 0; idx <= index; idx++) {
-        collectionView.items[idx]['children'] = [];
+      collectionView.items[idx]['children'] = [];
     }
 
     while (index >= 0) {
@@ -346,7 +375,7 @@ export class ChildItemsGridComponent implements OnInit {
     while (index >= 0) {
       let parentItem = collectionView.items[index];
       if (parentItem.children.length > 0) {
-      this.pushChild(collectionView, parentItem)
+        this.pushChild(collectionView, parentItem)
       }
       delete parentItem.children;
       index--;
