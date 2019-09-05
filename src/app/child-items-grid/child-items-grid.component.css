@@ -93,10 +93,12 @@
 
 
 .bravo-menu-strip {
-    height: 100%;
-    background-color: #f0f0f0;
     display: flex;
-    flex-direction: row;
+    place-content: center flex-start;
+    justify-content: flex-start;
+    align-content: center;
+    max-width: 100%;
+    background-color: #f0f0f0;
 }
 
 .bravo-menustrip-item {
@@ -111,6 +113,7 @@
 
 .bravo-menustrip-item:hover{
     background-color: #d8e6f2;
+    color: #000 !important;
 
 }
 
@@ -135,4 +138,16 @@
     border-radius:  0;
     width: auto;
     justify-content: center;
+}
+
+
+#panelMain {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+#panelMain > bravo-group-path {
+    flex: 1 1 20px;
+    max-height: 20px;
 }

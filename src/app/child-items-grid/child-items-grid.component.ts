@@ -11,6 +11,8 @@ import { BravoWebGrid } from '../lib/ui/controls/bravo.web.grid';
 import { MenuStrip } from '../controller/menustrip';
 
 import { ResizeSensor } from 'css-element-queries/src/ResizeSensor';
+import { ToolStrip } from '../lib/ui/toolstrip/toolstrip';
+import { AlignmentEnum } from '../lib/core/core';
 
 
 class CustomMergeManager extends wjcGrid.MergeManager {
@@ -90,7 +92,7 @@ const columnPos = 1;
   templateUrl: './child-items-grid.component.html',
   styleUrls: ['./child-items-grid.component.css'],
 })
-export class ChildItemsGridComponent implements OnInit {
+export class ChildItemsGridComponent implements OnInit, AfterViewInit {
   data: any[];
   parentItems: any[];
   treeData = [];
@@ -114,6 +116,15 @@ export class ChildItemsGridComponent implements OnInit {
 
   }
 
+  public ngAfterViewInit() {
+    this.menu.itemsSource.push(new ToolStrip("1", null, `<img src="http://bravo8.bravo.com.vn/assets/img/DockRight.png" alt="" style="width: 16px;">`));
+    this.menu.setAlignment(this.menu.itemsSource[0], AlignmentEnum.Right);
+    this.menu.itemsSource[0].hostElement.setAttribute("disabled", "true");
+    this.menu.itemsSource.push(new ToolStrip("2", null, `<img src="http://bravo8.bravo.com.vn/assets/img/DockBottom.png" alt="" style="width: 16px;">`));
+    this.menu.setAlignment(this.menu.itemsSource[1], AlignmentEnum.Right);
+    this.menu.itemsSource[1].hostElement.setAttribute("disabled", "true");
+  }
+
 
   flexInitialized(flexgrid: BravoWebGrid) {
     // flexgrid.mergeManager = new CustomMergeManager(flexgrid);
@@ -124,7 +135,6 @@ export class ChildItemsGridComponent implements OnInit {
     flexgrid.zTreeColName = "ItemName";
     flexgrid.zMakingTreeNodeKeyColName = "_GroupOrder";
     flexgrid.groupBy(flexgrid.zMakingTreeNodeKeyColName);
-    
 
     this.brGroupPath = new BravoGrouppath(this.menu, flexgrid);
     this.menu.bMouseHoverDisable = true;

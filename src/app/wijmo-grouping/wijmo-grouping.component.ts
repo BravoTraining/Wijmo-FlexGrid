@@ -15,7 +15,7 @@ import { BravoGroupPathComponent } from '../bravo-group-path/bravo-group-path.co
 import { _DonutSegment } from 'wijmo/wijmo.chart';
 import { BravoGrouppath } from '../BravoClass/bravo.grouppath';
 import { BravoWebGrid, GroupColumnItem } from '../lib/ui/controls/bravo.web.grid';
-import { Dictionary, SortOrder, AggregateEnum } from '../lib/core/core';
+import { Dictionary, SortOrder, AggregateEnum, AlignmentEnum } from '../lib/core/core';
 
 
 @Component({
@@ -57,6 +57,11 @@ export class WijmoGroupingComponent implements OnInit, AfterViewInit {
   public ngAfterViewInit() {
     this.menuGroupPath.bMouseHoverDisable = true;
 
+      this.menuGroupPath.itemsSource.push(new ToolStrip("1", null, `<img src="http://bravo8.bravo.com.vn/assets/img/DockRight.png" alt="" style="width: 16px;">`));
+      this.menuGroupPath.setAlignment(this.menuGroupPath.itemsSource[0], AlignmentEnum.Right);
+      this.menuGroupPath.itemsSource.push(new ToolStrip("2", null, `<img src="http://bravo8.bravo.com.vn/assets/img/DockBottom.png" alt="" style="width: 16px;">`));
+      this.menuGroupPath.setAlignment(this.menuGroupPath.itemsSource[1], AlignmentEnum.Right);
+  
   }
 
   getInitData() {
